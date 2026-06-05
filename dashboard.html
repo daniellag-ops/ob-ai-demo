@@ -106,6 +106,31 @@ h1{font-size:18px;font-weight:500}
 .lsq{width:10px;height:10px;border-radius:2px;display:inline-block}
 .clbl{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px}
 .src{font-size:10px;color:var(--text3);margin-top:.5rem;font-style:italic}
+.triage-btn{width:100%;padding:15px;border-radius:12px;border:2px solid var(--red);background:var(--red-bg);color:var(--red);font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .15s}
+.triage-btn:hover{background:var(--red);color:#fff}
+.triage-area{margin-top:1rem}
+.triage-input{width:100%;font-size:13px;padding:10px 12px;border-radius:10px;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);outline:none;resize:none;line-height:1.55;font-family:inherit}
+.triage-input:focus{border-color:var(--red)}
+.triage-submit{margin-top:8px;width:100%;padding:10px;border-radius:8px;background:var(--red);color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;opacity:1;transition:opacity .15s}
+.triage-submit:disabled{opacity:.5;cursor:default}
+.triage-result{margin-top:1rem;border-radius:12px;padding:1rem 1.1rem}
+.tr-routine{background:#F0FDF4;border:1px solid #6EE7B7}
+.tr-call{background:#FFFBEB;border:1px solid #FCD34D}
+.tr-emergency{background:#FEF2F2;border:1px solid #FCA5A5}
+.triage-headline{font-size:14px;font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.tr-routine .triage-headline{color:#065F46}
+.tr-call .triage-headline{color:#92400E}
+.tr-emergency .triage-headline{color:#991B1B}
+.triage-msg{font-size:13px;line-height:1.6;color:var(--text2)}
+.triage-contact{margin-top:10px;font-size:12px;font-weight:500;padding:8px 12px;border-radius:8px;background:rgba(0,0,0,.06)}
+.tr-emergency .triage-contact{background:#FEE2E2;color:#991B1B}
+.rx-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.rx-row:last-child{border-bottom:none}
+.rx-icon{width:32px;height:32px;border-radius:8px;background:var(--teal-bg);color:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.rx-name{font-size:13px;font-weight:500;margin-bottom:1px}
+.rx-dose{font-size:11px;color:var(--text3)}
+.rx-btn{font-size:11px;padding:5px 12px;border-radius:20px;background:var(--teal-mid);color:#fff;border:none;cursor:pointer;white-space:nowrap;transition:all .2s}
+.rx-btn.requested{background:var(--teal-bg);color:var(--teal);cursor:default}
 
 /* ── Hospital: clinical blue, compact, urgent ── */
 body[data-view="h"]{background:#EBF3FD}
@@ -242,6 +267,17 @@ body[data-view="p"] .db-sub{font-size:13px}
 
   <div id="v-p" style="display:none">
     <div class="db-hdr"><div><p class="db-ttl">Your pregnancy — week 24</p><p class="db-sub">Hello, Maya · Due date: Sep 14, 2025 · Dr. Chen, OB-GYN</p></div><span class="pill pw"><i class="ti ti-alert-circle" style="font-size:11px"></i> 1 action needed</span></div>
+
+    <div class="card" style="margin-bottom:1rem">
+      <p class="ct"><i class="ti ti-stethoscope" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Symptom check</p>
+      <button class="triage-btn" id="triage-btn" onclick="openTriage()"><i class="ti ti-alert-triangle" style="font-size:18px"></i>Something feels wrong</button>
+      <div class="triage-area" id="triage-area" style="display:none">
+        <textarea class="triage-input" id="triage-input" rows="3" placeholder="Describe what you're feeling… e.g. 'I have a bad headache and my hands look swollen'"></textarea>
+        <button class="triage-submit" id="triage-submit" onclick="runTriage()">Check symptoms</button>
+        <div id="triage-result"></div>
+      </div>
+    </div>
+
     <div class="card">
       <p class="ct"><i class="ti ti-timeline" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Pregnancy timeline</p>
       <div class="tl">
@@ -293,6 +329,26 @@ body[data-view="p"] .db-sub{font-size:13px}
       </div>
       <p style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">AI-assisted responses based on your clinical profile — not a substitute for your care team. For urgent concerns, call the clinic or go to labor &amp; delivery.</p>
     </div>
+    <div class="card" style="margin-top:1rem">
+      <p class="ct"><i class="ti ti-pill" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Your prescriptions — request delivery</p>
+      <div class="rx-row">
+        <div class="rx-icon"><i class="ti ti-leaf"></i></div>
+        <div style="flex:1"><p class="rx-name">Folic acid 400mcg</p><p class="rx-dose">Daily · Prenatal supplement</p></div>
+        <button class="rx-btn" onclick="requestRx(this)">Request delivery</button>
+      </div>
+      <div class="rx-row">
+        <div class="rx-icon"><i class="ti ti-pill"></i></div>
+        <div style="flex:1"><p class="rx-name">Prenatal vitamins</p><p class="rx-dose">Daily · Dr. Chen prescribed</p></div>
+        <button class="rx-btn" onclick="requestRx(this)">Request delivery</button>
+      </div>
+      <div class="rx-row">
+        <div class="rx-icon"><i class="ti ti-droplet"></i></div>
+        <div style="flex:1"><p class="rx-name">Ferrous sulfate 325mg</p><p class="rx-dose">Twice daily · Iron supplement</p></div>
+        <button class="rx-btn" onclick="requestRx(this)">Request delivery</button>
+      </div>
+      <p class="src" style="margin-top:.75rem">Delivered to your door within 4 hours · Approved by Dr. Chen · Powered by Maccabi Pharma</p>
+    </div>
+
     <div class="card">
       <p class="ct"><i class="ti ti-chart-bar" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Population context — how patients like you did</p>
       <div style="position:relative;width:100%;height:180px"><canvas id="ch-disp" role="img" aria-label="Bar chart showing claim rates by race ethnicity baseline vs AI-assisted from simulation">Claim rates by race and ethnicity from simulation data.</canvas></div>
@@ -480,6 +536,43 @@ function showGuideline(idx){
     '<li>Schedule follow-up within 1–2 weeks</li>'+
     '<li>Engage care coordinator for high-risk patients</li></ul>');
 }
+function openTriage(){
+  document.getElementById('triage-btn').style.display='none';
+  document.getElementById('triage-area').style.display='block';
+  document.getElementById('triage-input').focus();
+}
+async function runTriage(){
+  const input=document.getElementById('triage-input');
+  const symptom=input.value.trim();
+  if(!symptom)return;
+  const btn=document.getElementById('triage-submit');
+  btn.textContent='Checking…'; btn.disabled=true;
+  document.getElementById('triage-result').innerHTML='';
+  try{
+    const res=await fetch('/api/triage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({symptom})});
+    const d=await res.json();
+    const icons={routine:'circle-check',call:'phone-call',emergency:'ambulance'};
+    const contacts={
+      routine:'',
+      call:'<div class="triage-contact">📞 Clinic: +972-3-692-5678 &nbsp;·&nbsp; Open 8am–8pm</div>',
+      emergency:'<div class="triage-contact">🚨 Go to L&amp;D now &nbsp;·&nbsp; Lis Hospital, Entrance 4 &nbsp;·&nbsp; Or call 101</div>'
+    };
+    document.getElementById('triage-result').innerHTML=
+      '<div class="triage-result tr-'+d.urgency+'">'+
+      '<p class="triage-headline"><i class="ti ti-'+(icons[d.urgency]||'info-circle')+'"></i>'+d.headline+'</p>'+
+      '<p class="triage-msg">'+d.message+'</p>'+
+      (contacts[d.urgency]||'')+
+      '</div>';
+  }catch(e){
+    document.getElementById('triage-result').innerHTML='<div class="triage-result tr-call"><p class="triage-headline">Call the clinic to be safe</p><p class="triage-msg">We could not assess this automatically. Please call your clinic now.</p></div>';
+  }
+  btn.textContent='Check symptoms'; btn.disabled=false;
+}
+function requestRx(btn){
+  btn.textContent='✓ Requested'; btn.className='rx-btn requested';
+  setTimeout(()=>{ btn.textContent='🚚 On the way · ~3 hrs'; },1200);
+}
+
 function openModal(title, body){
   document.getElementById('modal-title').textContent = title;
   document.getElementById('modal-body').innerHTML = body;
@@ -498,7 +591,13 @@ function show(v){
   document.body.setAttribute('data-view',v);
   if(v==='h') render_hospital();
   if(v==='i') render_insurer();
-  if(v==='p') render_patient();
+  if(v==='p'){
+    const tb=document.getElementById('triage-btn');
+    const ta=document.getElementById('triage-area');
+    if(tb) tb.style.display='flex';
+    if(ta){ ta.style.display='none'; document.getElementById('triage-result').innerHTML=''; document.getElementById('triage-input').value=''; }
+    render_patient();
+  }
 }
 show('h');
 </script>
