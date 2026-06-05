@@ -80,9 +80,24 @@ h1{font-size:18px;font-weight:500}
 .lsq{width:10px;height:10px;border-radius:2px;display:inline-block}
 .clbl{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px}
 .src{font-size:10px;color:var(--text3);margin-top:.5rem;font-style:italic}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--bg);border-radius:var(--rl);padding:1.5rem;max-width:440px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);position:relative;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:500;margin-bottom:.75rem}
+.modal-body{font-size:13px;color:var(--text2);line-height:1.65}
+.modal-body ul{padding-left:1.1rem;margin-top:.4rem}
+.modal-body li{margin-bottom:.35rem}
+.modal-close{position:absolute;top:.85rem;right:1rem;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);line-height:1}
 </style>
 </head>
 <body>
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <p class="modal-title" id="modal-title"></p>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
 <div class="app">
   <div class="logo-row">
     <div class="logo-dot"><i class="ti ti-heart-rate-monitor"></i></div>
@@ -176,7 +191,7 @@ h1{font-size:18px;font-weight:500}
     <div class="card" style="margin-top:1rem">
       <p class="ct"><i class="ti ti-message-circle" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>AI health assistant</p>
       <div class="aib"><span style="font-weight:500;color:var(--blue)">Reminder:</span> Your glucose tolerance test is coming up at week 28. In our simulation, <span id="p-gdm-msg"></span>% of patients like you had unscreened GDM — this test catches it early. No fasting needed beforehand.</div>
-      <div class="qb"><button class="btn p">What to expect</button><button class="btn">Warning signs to watch</button><button class="btn">Nutrition advice</button></div>
+      <div class="qb"><button class="btn p" onclick="openModal('What to expect — Glucose Tolerance Test','<p>The 1-hour glucose challenge test (GCT) is a simple screening done between weeks 24–28.</p><ul><li>No fasting required beforehand</li><li>You drink a sweet glucose solution</li><li>Blood is drawn 1 hour later</li><li>Results in 1–2 days</li></ul><p style=\"margin-top:.6rem\">If the screen is positive, a 3-hour fasting OGTT confirms diagnosis. Most patients with a positive screen do <em>not</em> have GDM.</p>')">What to expect</button><button class="btn" onclick="openModal('Warning signs to watch','<p>Contact your care team or go to L&amp;D immediately if you experience:</p><ul><li>Severe headache that does not go away</li><li>Vision changes — blurring, spots, or flashes</li><li>Sudden swelling of face, hands, or feet</li><li>Pain in the upper right abdomen</li><li>Decreased fetal movement</li><li>Vaginal bleeding</li></ul><p style=\"margin-top:.6rem\">These may be signs of preeclampsia or other urgent conditions. Do not wait for your next appointment.</p>')">Warning signs to watch</button><button class="btn" onclick="openModal('Nutrition advice for GDM prevention','<p>Evidence-based nutrition tips that reduce GDM risk:</p><ul><li>Choose complex carbs — whole grains, legumes, vegetables</li><li>Limit sugary drinks, juice, and refined carbs</li><li>Eat smaller, more frequent meals (every 3–4 hours)</li><li>Include protein at every meal to steady blood sugar</li><li>30 min of moderate activity most days (walk, swim, prenatal yoga)</li></ul><p style=\"margin-top:.6rem\">A registered dietitian consult is covered by most plans — ask your OB for a referral.</p>')">Nutrition advice</button></div>
     </div>
     <div class="card">
       <p class="ct"><i class="ti ti-chart-bar" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Population context — how patients like you did</p>
@@ -220,7 +235,7 @@ function render_hospital(){
         <p class="ad">${g.desc}</p>
         <p class="am">${g.type} · ${sev.charAt(0).toUpperCase()+sev.slice(1)}</p>
       </div>
-      ${sev==='critical'?'<button class="btn p">View protocol</button>':'<button class="btn">Guidelines</button>'}
+      ${sev==='critical'?`<button class="btn p" onclick="showProtocol(${idx})">View protocol</button>`:`<button class="btn" onclick="showGuideline(${idx})">Guidelines</button>`}
     </div>`;
   }).join('');
   document.getElementById('h-alerts').innerHTML = alert_html||'<p style="font-size:13px;color:var(--text2);padding:8px 0">No critical alerts at this time.</p>';
@@ -236,7 +251,7 @@ function render_hospital(){
       <span style="color:var(--text2)">${GAs[i]||'30w'}</span>
       <span><span class="rp ${RPCL[i]}">${RISK[i]}</span></span>
       <span style="color:${FCOL[i]};font-weight:500">${FLAGS[i]}</span>
-      <button class="btn" style="font-size:10px;padding:3px 7px">View</button>
+      <button class="btn" style="font-size:10px;padding:3px 7px" onclick="showPatient(${i})">View</button>
     </div>`).join('');
 
   const m=h.monthly_trend;
@@ -283,6 +298,50 @@ function render_patient(){
   if(!charts.bp) charts.bp=new Chart(document.getElementById('ch-bp'),{type:'line',data:{labels:['Wk 8','Wk 12','Wk 16','Wk 20','Wk 24'],datasets:[{label:'Systolic',data:[118,120,116,119,122],borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.06)',fill:true,tension:0.35,pointRadius:4,borderWidth:2,borderDash:[]},{label:'Diastolic',data:[75,78,74,76,78],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.04)',fill:true,tension:0.35,pointRadius:4,borderWidth:2,borderDash:[4,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}},grid:{display:false}},y:{min:60,max:145,ticks:{font:{size:9}},title:{display:true,text:'mmHg',font:{size:9}}}}}});
   if(!charts.disp) charts.disp=new Chart(document.getElementById('ch-disp'),{type:'bar',data:{labels:dlabels,datasets:[{label:'Baseline',data:disp.map(x=>x.baseline),backgroundColor:'#B5D4F4',borderWidth:0},{label:'AI-assisted',data:disp.map(x=>x.ai),backgroundColor:'#1D9E75',borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},scales:{x:{ticks:{font:{size:9},autoSkip:false,maxRotation:25}},y:{ticks:{font:{size:9},callback:v=>v+'%'},title:{display:true,text:'Claim rate %',font:{size:9}}}}}});
 }
+
+const GAs_const=['28w','36w','22w','30w'];
+const RISK_const=['High','High','Medium','Low'];
+const FLAGS_const=['2 open','1 open','1 open','Clear'];
+
+function showPatient(i){
+  const a=D.hospital.alerts[i]||{};
+  openModal('Patient '+(i+1)+' — Chart Summary',
+    '<p><strong>Age:</strong> '+a.age+'&nbsp;|&nbsp;<strong>Insurance:</strong> '+a.insurance+'</p>'+
+    '<p style="margin-top:.5rem"><strong>Gestational age:</strong> '+(GAs_const[i]||'30w')+'</p>'+
+    '<p style="margin-top:.5rem"><strong>Risk level:</strong> '+RISK_const[i]+'</p>'+
+    '<p style="margin-top:.5rem"><strong>Open flags:</strong> '+FLAGS_const[i]+'</p>'+
+    '<p style="margin-top:.75rem;font-size:12px;color:var(--text3)">Full EHR integration would display vitals, labs, orders, and notes here.</p>');
+}
+function showProtocol(idx){
+  const g=(D.hospital.alerts[idx]||{gaps:[{}]}).gaps[0]||{};
+  openModal('ACOG Protocol — '+g.type,
+    '<p><strong>Immediate actions required:</strong></p>'+
+    '<ul><li>Verify BP reading and recheck in 15 minutes</li>'+
+    '<li>Notify attending OB and charge nurse</li>'+
+    '<li>Obtain IV access and draw labs (CBC, CMP, uric acid, LFTs)</li>'+
+    '<li>Initiate magnesium sulfate per ACOG protocol if BP ≥160/110</li>'+
+    '<li>Document in chart and set escalation timer</li></ul>'+
+    '<p style="margin-top:.6rem">Source: ACOG Practice Bulletin No. 222.</p>');
+}
+function showGuideline(idx){
+  const g=(D.hospital.alerts[idx]||{gaps:[{}]}).gaps[0]||{};
+  openModal('Clinical Guideline — '+g.type,
+    '<p>Recommended next steps per ACOG / SMFM guidelines:</p>'+
+    '<ul><li>Review patient chart and confirm diagnosis criteria</li>'+
+    '<li>Order appropriate workup if not already done</li>'+
+    '<li>Document gap closure in EHR care plan</li>'+
+    '<li>Schedule follow-up within 1–2 weeks</li>'+
+    '<li>Engage care coordinator for high-risk patients</li></ul>');
+}
+function openModal(title, body){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
 
 function show(v){
   ['h','i','p'].forEach(id=>{
