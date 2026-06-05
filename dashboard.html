@@ -101,6 +101,7 @@ h1{font-size:18px;font-weight:500}
 .chat-q{font-size:11px;padding:5px 11px;border-radius:20px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer}
 .chat-q:hover{background:var(--bg2)}
 @media(max-width:560px){.two{grid-template-columns:1fr!important}.chat-box{height:220px}.bubble{max-width:88%}}
+@keyframes spin{to{transform:rotate(360deg)}}
 .leg{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:11px;color:var(--text2)}
 .leg span{display:flex;align-items:center;gap:4px}
 .lsq{width:10px;height:10px;border-radius:2px;display:inline-block}
@@ -158,6 +159,24 @@ h1{font-size:18px;font-weight:500}
 .feed-act.liked{color:var(--red)}
 .comm-post-btn{margin-top:1rem;width:100%;padding:10px;border-radius:8px;border:0.5px dashed var(--border2);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
 .comm-post-btn:hover{background:var(--bg2)}
+.roi-slider-row{margin-bottom:1.1rem}
+.roi-lbl-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:5px}
+.roi-lbl-val{font-weight:600;color:var(--text)}
+input[type=range]{width:100%;height:4px;accent-color:var(--teal-mid);cursor:pointer;outline:none}
+.roi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:1.25rem}
+.roi-kpi{background:var(--bg2);border-radius:var(--r);padding:.9rem 1rem;text-align:center}
+.roi-kv{font-size:22px;font-weight:700;color:var(--teal);margin-bottom:3px}
+.roi-kv.hi{color:#4F46E5}
+.roi-kl{font-size:11px;color:var(--text2)}
+.roi-note{font-size:10px;color:var(--text3);margin-top:.85rem;text-align:center;font-style:italic}
+.handoff-wrap{background:var(--bg2);border-radius:var(--r);padding:1rem 1.1rem;font-size:12px;line-height:1.8;color:var(--text)}
+.ho-sec{margin-bottom:.75rem}
+.ho-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px}
+.ho-crit{color:var(--red);font-weight:500}
+.ho-mod{color:var(--amber);font-weight:500}
+.gen-btn{width:100%;padding:10px;border-radius:var(--r);background:var(--blue-bg);color:var(--blue);border:0.5px solid #93C5FD;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.gen-btn:hover{background:#DBEAFE}
+.gen-btn:disabled{opacity:.5;cursor:default}
 
 /* ── Hospital: clinical blue, compact, urgent ── */
 body[data-view="h"]{background:#EBF3FD}
@@ -268,6 +287,11 @@ body[data-view="p"] .db-sub{font-size:13px}
     <div style="position:relative;width:100%;height:200px"><canvas id="ch-h" role="img" aria-label="Bar chart of monthly OB claims baseline vs AI-assisted">Monthly claim trends from simulation.</canvas></div>
     <div class="leg"><span><span class="lsq" style="background:#B5D4F4"></span>Baseline</span><span><span class="lsq" style="background:#1D9E75"></span>AI-assisted</span></div>
     <p class="src">Source: Synthea synthetic population · HCUP NIS 2021 benchmark rates</p>
+    <div class="card" style="margin-top:1rem">
+      <p class="ct"><i class="ti ti-clipboard-text" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Shift handoff summary</p>
+      <div id="handoff-body"></div>
+      <button class="gen-btn" id="handoff-btn" onclick="generateHandoff()"><i class="ti ti-sparkles" style="font-size:14px"></i>Generate shift summary</button>
+    </div>
   </div>
 
   <div id="v-i" style="display:none">
@@ -290,6 +314,20 @@ body[data-view="p"] .db-sub{font-size:13px}
       <div class="card" style="margin-bottom:0"><p class="ct">Savings by claim type</p><div style="position:relative;width:100%;height:190px"><canvas id="ch-is" role="img" aria-label="Bar chart of cost savings by claim type from simulation">Cost savings by claim type.</canvas></div></div>
     </div>
     <p class="src" style="margin-top:.75rem">Source: simulation.py · patients_baseline.csv / patients_ai.csv · HCUP NIS calibrated rates</p>
+
+    <div class="card" style="margin-top:1rem">
+      <p class="ct"><i class="ti ti-calculator" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>ROI calculator — project your savings</p>
+      <div class="roi-slider-row">
+        <div class="roi-lbl-row"><span>Deliveries per year</span><span class="roi-lbl-val" id="roi-del-lbl">10,000</span></div>
+        <input type="range" id="roi-del" min="1000" max="50000" step="500" value="10000" oninput="updateROI()">
+      </div>
+      <div class="roi-slider-row">
+        <div class="roi-lbl-row"><span>AI coverage</span><span class="roi-lbl-val" id="roi-cov-lbl">75%</span></div>
+        <input type="range" id="roi-cov" min="40" max="100" step="5" value="75" oninput="updateROI()">
+      </div>
+      <div class="roi-grid" id="roi-grid"></div>
+      <p class="roi-note">Based on simulation ratios · Platform cost estimated at $50/delivery · Physician response rate 69%</p>
+    </div>
   </div>
 
   <div id="v-p" style="display:none">
@@ -449,6 +487,7 @@ function render_hospital(){
 }
 
 function render_insurer(){
+  if(!document.getElementById('roi-grid').hasChildNodes()) updateROI();
   const ins=D.insurer, m=D.meta;
   document.getElementById('i-del').textContent   = fmt_num(ins.kpis.network_deliveries);
   document.getElementById('i-saved').textContent = fmt_cost(ins.kpis.cost_saved);
@@ -630,6 +669,55 @@ function showGuideline(idx){
     '<li>Schedule follow-up within 1–2 weeks</li>'+
     '<li>Engage care coordinator for high-risk patients</li></ul>');
 }
+function updateROI(){
+  const del=parseInt(document.getElementById('roi-del').value);
+  const cov=parseInt(document.getElementById('roi-cov').value);
+  document.getElementById('roi-del-lbl').textContent=del.toLocaleString();
+  document.getElementById('roi-cov-lbl').textContent=cov+'%';
+  const scale=(del/10000)*(cov/75);
+  const claims=Math.round(250*scale);
+  const saved=Math.round(4625000*scale);
+  const deaths=Math.max(1,Math.round(7*scale));
+  const platformCost=del*50;
+  const roi=Math.round(((saved-platformCost)/platformCost)*100);
+  const fmt=v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.round(v/1e3)+'k':'$'+v;
+  document.getElementById('roi-grid').innerHTML=
+    '<div class="roi-kpi"><div class="roi-kv">'+claims.toLocaleString()+'</div><div class="roi-kl">Claims prevented</div></div>'+
+    '<div class="roi-kpi"><div class="roi-kv">'+fmt(saved)+'</div><div class="roi-kl">Cost saved</div></div>'+
+    '<div class="roi-kpi"><div class="roi-kv">'+deaths+'</div><div class="roi-kl">Deaths averted</div></div>'+
+    '<div class="roi-kpi"><div class="roi-kv hi">'+roi+'%</div><div class="roi-kl">Net ROI</div></div>';
+}
+
+function generateHandoff(){
+  const btn=document.getElementById('handoff-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ti ti-loader-2" style="font-size:14px;animation:spin 1s linear infinite"></i>Generating…';
+  setTimeout(()=>{
+    const h=D.hospital; const k=h.kpis;
+    const now=new Date();
+    const time=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    const date=now.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+    const crits=h.alerts.filter(a=>a.gaps[0].severity==='critical');
+    const mods=h.alerts.filter(a=>a.gaps[0].severity==='moderate');
+    document.getElementById('handoff-body').innerHTML=`
+      <div class="handoff-wrap">
+        <div class="ho-sec"><div class="ho-lbl">Shift summary</div>${date} · ${time} · Mount Sinai OB Unit — Labor &amp; Delivery</div>
+        <div class="ho-sec"><div class="ho-lbl">Unit status</div>
+          ${k.active_patients} active patients &nbsp;·&nbsp; ${k.flags_today} AI flags fired today &nbsp;·&nbsp; ${k.flags_acted_today} acted on &nbsp;·&nbsp;
+          <span class="${k.unresolved_alerts>3?'ho-crit':'ho-mod'}">${k.unresolved_alerts} unresolved</span>
+        </div>
+        <div class="ho-sec"><div class="ho-lbl">Critical flags — requires immediate handoff</div>
+          ${crits.length?crits.map((a,i)=>`<div class="ho-crit">▲ Patient ${i+1} (Age ${a.age} · ${a.insurance}) — ${a.gaps[0].desc}</div>`).join(''):'No critical flags at close of shift.'}
+        </div>
+        <div class="ho-sec"><div class="ho-lbl">Moderate flags — monitor</div>
+          ${mods.length?mods.map((a,i)=>`<div class="ho-mod">● Patient ${crits.length+i+1} (Age ${a.age} · ${a.insurance}) — ${a.gaps[0].desc}</div>`).join(''):'None.'}
+        </div>
+        <div class="ho-sec"><div class="ho-lbl">Guideline adherence</div>${k.guideline_adherence}% this shift &nbsp;·&nbsp; up from ${k.adherence_baseline}% baseline &nbsp;·&nbsp; ${k.claims_prevented_mtd} claims prevented MTD</div>
+        <div class="ho-lbl" style="margin-top:.25rem">Incoming team: review unresolved flags before first rounds.</div>
+      </div>`;
+    btn.innerHTML='<i class="ti ti-refresh" style="font-size:14px"></i>Regenerate'; btn.disabled=false;
+  },1200);
+}
+
 function openTriage(){
   document.getElementById('triage-btn').style.display='none';
   document.getElementById('triage-area').style.display='block';
