@@ -316,7 +316,7 @@ body[data-view="p"] .db-sub{font-size:13px}
     <p class="src" style="margin-top:.75rem">Source: simulation.py · patients_baseline.csv / patients_ai.csv · HCUP NIS calibrated rates</p>
 
     <div class="card" style="margin-top:1rem">
-      <p class="ct"><i class="ti ti-calculator" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>ROI calculator — project your savings</p>
+      <p class="ct"><i class="ti ti-calculator" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>ROI calculator — CFO view</p>
       <div class="roi-slider-row">
         <div class="roi-lbl-row"><span>Deliveries per year</span><span class="roi-lbl-val" id="roi-del-lbl">10,000</span></div>
         <input type="range" id="roi-del" min="1000" max="50000" step="500" value="10000" oninput="updateROI()">
@@ -325,8 +325,8 @@ body[data-view="p"] .db-sub{font-size:13px}
         <div class="roi-lbl-row"><span>AI coverage</span><span class="roi-lbl-val" id="roi-cov-lbl">75%</span></div>
         <input type="range" id="roi-cov" min="40" max="100" step="5" value="75" oninput="updateROI()">
       </div>
-      <div class="roi-grid" id="roi-grid"></div>
-      <p class="roi-note">Based on simulation ratios · Platform cost estimated at $50/delivery · Physician response rate 69%</p>
+      <div id="roi-grid"></div>
+      <p class="roi-note">$25/delivery · Based on simulation ratios (HCUP NIS 2021) · 69% physician response rate</p>
     </div>
   </div>
 
@@ -678,14 +678,39 @@ function updateROI(){
   const claims=Math.round(250*scale);
   const saved=Math.round(4625000*scale);
   const deaths=Math.max(1,Math.round(7*scale));
-  const platformCost=del*50;
-  const roi=Math.round(((saved-platformCost)/platformCost)*100);
-  const fmt=v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.round(v/1e3)+'k':'$'+v;
-  document.getElementById('roi-grid').innerHTML=
-    '<div class="roi-kpi"><div class="roi-kv">'+claims.toLocaleString()+'</div><div class="roi-kl">Claims prevented</div></div>'+
-    '<div class="roi-kpi"><div class="roi-kv">'+fmt(saved)+'</div><div class="roi-kl">Cost saved</div></div>'+
-    '<div class="roi-kpi"><div class="roi-kv">'+deaths+'</div><div class="roi-kl">Deaths averted</div></div>'+
-    '<div class="roi-kpi"><div class="roi-kv hi">'+roi+'%</div><div class="roi-kl">Net ROI</div></div>';
+  const investment=del*25;
+  const net=saved-investment;
+  const multiple=Math.round((saved/investment)*10)/10;
+  const payback=Math.round((investment/saved)*12);
+  const fmt=v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'k':'$'+v;
+  document.getElementById('roi-grid').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div class="roi-kpi" style="background:#FEF2F2;border:0.5px solid #FECACA">
+        <div class="roi-kl" style="margin-bottom:4px">You invest (annual)</div>
+        <div class="roi-kv" style="color:#991B1B">${fmt(investment)}</div>
+        <div class="roi-kl">$25 × ${del.toLocaleString()} deliveries</div>
+      </div>
+      <div class="roi-kpi" style="background:#F0FDF4;border:0.5px solid #6EE7B7">
+        <div class="roi-kl" style="margin-bottom:4px">Claims cost saved</div>
+        <div class="roi-kv" style="color:#065F46">${fmt(saved)}</div>
+        <div class="roi-kl">${claims.toLocaleString()} claims prevented</div>
+      </div>
+    </div>
+    <div style="background:var(--bg2);border-radius:var(--r);padding:.9rem 1rem;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:3px">Net savings after platform cost</div>
+        <div style="font-size:26px;font-weight:700;color:#4F46E5">${fmt(net)}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:3px">Return on every $1 invested</div>
+        <div style="font-size:26px;font-weight:700;color:var(--teal)">${multiple}×</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div class="roi-kpi"><div class="roi-kv" style="font-size:18px">${payback} mo</div><div class="roi-kl">Payback period</div></div>
+      <div class="roi-kpi"><div class="roi-kv" style="font-size:18px">${deaths}</div><div class="roi-kl">Deaths averted</div></div>
+      <div class="roi-kpi"><div class="roi-kv" style="font-size:18px">${fmt(investment/12)}</div><div class="roi-kl">Monthly cost</div></div>
+    </div>`;
 }
 
 function generateHandoff(){
