@@ -12,7 +12,10 @@
 @media(prefers-color-scheme:dark){:root{--bg:#0f172a;--bg2:#1e293b;--bg3:#0f172a;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);--teal-bg:#04342C;--blue-bg:#042C53;--amber-bg:#412402;--red-bg:#501313}}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh}
 .app{max-width:780px;margin:0 auto;padding:2rem 1rem}
-.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.logo-left{display:flex;align-items:center;gap:10px}
+.nav-btn{font-size:12px;font-weight:500;padding:5px 12px;border-radius:var(--r);border:0.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.nav-btn:hover{background:var(--bg2)}
 .logo-dot{width:28px;height:28px;border-radius:8px;background:var(--teal-mid);display:flex;align-items:center;justify-content:center}
 .logo-dot i{color:#fff;font-size:15px}
 h1{font-size:18px;font-weight:500}
@@ -100,11 +103,14 @@ h1{font-size:18px;font-weight:500}
 </div>
 <div class="app">
   <div class="logo-row">
-    <div class="logo-dot"><i class="ti ti-heart-rate-monitor"></i></div>
-    <div>
-      <h1>OB & Maternity AI <span class="data-badge"><i class="ti ti-database" style="font-size:11px"></i>Live simulation data</span></h1>
-      <p class="sub">Daniella Gilboa · Synthea + HCUP NIS 2021 + CDC 2021 · 10,000 simulated deliveries</p>
+    <div class="logo-left">
+      <div class="logo-dot"><i class="ti ti-heart-rate-monitor"></i></div>
+      <div>
+        <h1>OB & Maternity AI <span class="data-badge"><i class="ti ti-database" style="font-size:11px"></i>Live simulation data</span></h1>
+        <p class="sub">Daniella Gilboa · Synthea + HCUP NIS 2021 + CDC 2021 · 10,000 simulated deliveries</p>
+      </div>
     </div>
+    <a href="index.html" class="nav-btn"><i class="ti ti-info-circle" style="font-size:13px"></i>About this simulation</a>
   </div>
 
   <div class="tabs">
