@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OB & Maternity AI — Clinical Decision Support Demo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f4f7f9;--bg3:#eef1f4;--text:#0f172a;--text2:#64748b;--text3:#94a3b8;--border:rgba(0,0,0,.10);--border2:rgba(0,0,0,.18);--teal:#0F6E56;--teal-bg:#E1F5EE;--teal-mid:#1D9E75;--blue:#185FA5;--blue-bg:#E6F1FB;--blue-mid:#378ADD;--amber:#854F0B;--amber-bg:#FAEEDA;--red:#A32D2D;--red-bg:#FCEBEB;--r:8px;--rl:12px}
+@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--bg2:#1e293b;--bg3:#0f172a;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);--teal-bg:#04342C;--blue-bg:#042C53;--amber-bg:#412402;--red-bg:#501313}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh}
+.app{max-width:780px;margin:0 auto;padding:2rem 1rem}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.logo-dot{width:28px;height:28px;border-radius:8px;background:var(--teal-mid);display:flex;align-items:center;justify-content:center}
+.logo-dot i{color:#fff;font-size:15px}
+h1{font-size:18px;font-weight:500}
+.sub{font-size:12px;color:var(--text2);margin-top:2px;margin-bottom:1.5rem}
+.data-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 9px;border-radius:20px;background:var(--blue-bg);color:var(--blue);font-weight:500;margin-left:8px;vertical-align:middle}
+.tabs{display:flex;border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem}
+.tab{flex:1;padding:10px 6px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--text2);cursor:pointer;border-right:0.5px solid var(--border)}
+.tab:last-child{border-right:none}
+.tab.on{background:var(--bg2);color:var(--text)}
+.tab i{display:block;font-size:18px;margin-bottom:3px}
+.db-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;gap:12px}
+.db-ttl{font-size:16px;font-weight:500}
+.db-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;white-space:nowrap}
+.pl{background:var(--teal-bg);color:var(--teal)}
+.pw{background:var(--amber-bg);color:var(--amber)}
+.pa{background:var(--red-bg);color:var(--red)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem}
+.kpi{background:var(--bg2);border-radius:var(--r);padding:.85rem 1rem}
+.kl{font-size:11px;color:var(--text2);margin-bottom:4px}
+.kv{font-size:20px;font-weight:500}
+.kv.t{color:var(--teal)}.kv.b{color:var(--blue)}.kv.r{color:var(--red)}
+.ks{font-size:11px;color:var(--text3);margin-top:2px}
+.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl);padding:1rem 1.25rem;margin-bottom:1rem}
+.ct{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.75rem}
+.ar{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.ar:last-child{border-bottom:none}
+.ai{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.ir{background:var(--red-bg);color:var(--red)}.iw{background:var(--amber-bg);color:var(--amber)}.it{background:var(--teal-bg);color:var(--teal)}
+.ab{flex:1;min-width:0}
+.an{font-size:13px;font-weight:500;margin-bottom:2px}
+.ad{font-size:12px;color:var(--text2);margin-bottom:4px;line-height:1.5}
+.am{font-size:11px;color:var(--text3)}
+.btn{font-size:11px;padding:5px 11px;border-radius:6px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.btn:hover{background:var(--bg2)}.btn.p{background:var(--teal-bg);color:var(--teal);border-color:#9FE1CB}
+.pr{display:grid;grid-template-columns:1fr 48px 60px 60px 44px;gap:8px;align-items:center;font-size:12px;padding:8px 0;border-bottom:0.5px solid var(--border)}
+.pr:last-child{border-bottom:none}
+.pn{font-weight:500}.pd{font-size:11px;color:var(--text2)}
+.rp{display:inline-block;font-size:10px;padding:2px 7px;border-radius:12px;font-weight:500}
+.rph{background:var(--red-bg);color:var(--red)}.rpm{background:var(--amber-bg);color:var(--amber)}.rpl{background:var(--teal-bg);color:var(--teal)}
+.ins-t{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.ins-t th{text-align:left;padding:6px 8px;font-weight:500;font-size:11px;color:var(--text2);border-bottom:0.5px solid var(--border);text-transform:uppercase;letter-spacing:.04em}
+.ins-t td{padding:8px;border-bottom:0.5px solid var(--border);vertical-align:middle}
+.ins-t tr:last-child td{border-bottom:none}
+.spark{display:inline-flex;gap:2px;align-items:flex-end;height:18px}
+.spark span{width:4px;border-radius:1px;background:var(--blue-mid);display:inline-block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:520px){.two{grid-template-columns:1fr}}
+.tl{display:flex;margin-bottom:1.25rem}
+.ts{flex:1;text-align:center;position:relative}
+.ts::before{content:'';position:absolute;top:14px;left:50%;right:-50%;height:2px;background:var(--border);z-index:0}
+.ts:last-child::before{display:none}
+.td{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:13px;position:relative;z-index:1}
+.td.d{background:var(--teal-bg);color:var(--teal);border:2px solid var(--teal-mid)}
+.td.n{background:var(--blue-bg);color:var(--blue);border:2px solid var(--blue-mid)}
+.td.u{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+.tll{font-size:11px;color:var(--text2)}.tlw{font-size:10px;color:var(--text3)}
+.cr{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.cr:last-child{border-bottom:none}.cl{flex:1}.cd{font-size:11px;color:var(--text3)}
+.cw{background:var(--amber-bg);margin:0 -1.25rem;padding:8px 1.25rem}
+.aib{background:var(--bg2);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:.75rem;font-size:13px;line-height:1.6}
+.qb{display:flex;gap:8px;flex-wrap:wrap}
+.leg{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:11px;color:var(--text2)}
+.leg span{display:flex;align-items:center;gap:4px}
+.lsq{width:10px;height:10px;border-radius:2px;display:inline-block}
+.clbl{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px}
+.src{font-size:10px;color:var(--text3);margin-top:.5rem;font-style:italic}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--bg);border-radius:var(--rl);padding:1.5rem;max-width:440px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);position:relative;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:500;margin-bottom:.75rem}
+.modal-body{font-size:13px;color:var(--text2);line-height:1.65}
+.modal-body ul{padding-left:1.1rem;margin-top:.4rem}
+.modal-body li{margin-bottom:.35rem}
+.modal-close{position:absolute;top:.85rem;right:1rem;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);line-height:1}
+</style>
+</head>
+<body>
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <p class="modal-title" id="modal-title"></p>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+<div class="app">
+  <div class="logo-row">
+    <div class="logo-dot"><i class="ti ti-heart-rate-monitor"></i></div>
+    <div>
+      <h1>OB & Maternity AI <span class="data-badge"><i class="ti ti-database" style="font-size:11px"></i>Live simulation data</span></h1>
+      <p class="sub">Daniella Gilboa · Synthea + HCUP NIS 2021 + CDC 2021 · 10,000 simulated deliveries</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" onclick="show('h')" id="t-h"><i class="ti ti-building-hospital"></i>Hospital</button>
+    <button class="tab" onclick="show('i')" id="t-i"><i class="ti ti-shield-check"></i>Insurer</button>
+    <button class="tab" onclick="show('p')" id="t-p"><i class="ti ti-heart"></i>Patient</button>
+  </div>
+
+  <div id="v-h">
+    <div class="db-hdr"><div><p class="db-ttl">Clinical decision support — OB unit</p><p class="db-sub">Mount Sinai Medical Center · Labor & Delivery · Live</p></div><span class="pill pl"><i class="ti ti-radio" style="font-size:11px"></i> <span id="h-active"></span> active patients</span></div>
+    <div class="kpis">
+      <div class="kpi"><p class="kl">AI flags today</p><p class="kv b" id="h-flags"></p><p class="ks" id="h-acted"></p></div>
+      <div class="kpi"><p class="kl">Claims prevented MTD</p><p class="kv t" id="h-claims"></p><p class="ks" id="h-saved"></p></div>
+      <div class="kpi"><p class="kl">Guideline adherence</p><p class="kv t" id="h-adh"></p><p class="ks" id="h-adh-sub"></p></div>
+      <div class="kpi"><p class="kl">Unresolved alerts</p><p class="kv r" id="h-unres"></p><p class="ks">needs action</p></div>
+    </div>
+    <div class="card">
+      <p class="ct"><i class="ti ti-bell" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Active AI alerts — real gaps from simulation</p>
+      <div id="h-alerts"></div>
+    </div>
+    <div class="card">
+      <p class="ct"><i class="ti ti-users" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Active patient list</p>
+      <div class="pr" style="color:var(--text2);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding-bottom:6px"><span>Patient</span><span>GA</span><span>Risk</span><span>Flags</span><span></span></div>
+      <div id="h-patients"></div>
+    </div>
+    <p class="clbl">Monthly claims — baseline vs AI-assisted</p>
+    <div style="position:relative;width:100%;height:200px"><canvas id="ch-h" role="img" aria-label="Bar chart of monthly OB claims baseline vs AI-assisted">Monthly claim trends from simulation.</canvas></div>
+    <div class="leg"><span><span class="lsq" style="background:#B5D4F4"></span>Baseline</span><span><span class="lsq" style="background:#1D9E75"></span>AI-assisted</span></div>
+    <p class="src">Source: Synthea synthetic population · HCUP NIS 2021 benchmark rates</p>
+  </div>
+
+  <div id="v-i" style="display:none">
+    <div class="db-hdr"><div><p class="db-ttl">OB network performance — portfolio view</p><p class="db-sub">Network · Simulation cohort · 10,000 deliveries</p></div><span class="pill pl"><i class="ti ti-refresh" style="font-size:11px"></i> Simulation data</span></div>
+    <div class="kpis">
+      <div class="kpi"><p class="kl">Network deliveries</p><p class="kv" id="i-del"></p><p class="ks">simulated cohort</p></div>
+      <div class="kpi"><p class="kl">Claims cost saved</p><p class="kv t" id="i-saved"></p><p class="ks">vs no-AI baseline</p></div>
+      <div class="kpi"><p class="kl">Claims prevented</p><p class="kv b" id="i-claims"></p><p class="ks" id="i-pct"></p></div>
+      <div class="kpi"><p class="kl">AI claim rate</p><p class="kv t" id="i-rate"></p><p class="ks" id="i-rate-sub"></p></div>
+    </div>
+    <div class="card">
+      <p class="ct"><i class="ti ti-building-hospital" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Hospital performance — modelled at 4 coverage levels</p>
+      <table class="ins-t">
+        <thead><tr><th style="width:34%">Hospital</th><th style="width:12%">Deliveries</th><th style="width:13%">AI coverage</th><th style="width:12%">Claim rate</th><th style="width:13%">Trend</th><th style="width:16%">Status</th></tr></thead>
+        <tbody id="i-hosp-rows"></tbody>
+      </table>
+    </div>
+    <div class="two">
+      <div class="card" style="margin-bottom:0"><p class="ct">Top care gaps — simulation population</p><div style="position:relative;width:100%;height:190px"><canvas id="ch-ig" role="img" aria-label="Horizontal bar chart of top care gaps from simulation">Care gap frequencies from simulation data.</canvas></div></div>
+      <div class="card" style="margin-bottom:0"><p class="ct">Savings by claim type</p><div style="position:relative;width:100%;height:190px"><canvas id="ch-is" role="img" aria-label="Bar chart of cost savings by claim type from simulation">Cost savings by claim type.</canvas></div></div>
+    </div>
+    <p class="src" style="margin-top:.75rem">Source: simulation.py · patients_baseline.csv / patients_ai.csv · HCUP NIS calibrated rates</p>
+  </div>
+
+  <div id="v-p" style="display:none">
+    <div class="db-hdr"><div><p class="db-ttl">Your pregnancy — week 24</p><p class="db-sub">Hello, Maya · Due date: Sep 14, 2025 · Dr. Chen, OB-GYN</p></div><span class="pill pw"><i class="ti ti-alert-circle" style="font-size:11px"></i> 1 action needed</span></div>
+    <div class="card">
+      <p class="ct"><i class="ti ti-timeline" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Pregnancy timeline</p>
+      <div class="tl">
+        <div class="ts"><div class="td d"><i class="ti ti-check" style="font-size:12px"></i></div><div class="tll">1st trimester</div><div class="tlw">Wk 1–12</div></div>
+        <div class="ts"><div class="td d"><i class="ti ti-check" style="font-size:12px"></i></div><div class="tll">Anatomy scan</div><div class="tlw">Wk 20</div></div>
+        <div class="ts"><div class="td n"><i class="ti ti-map-pin" style="font-size:12px"></i></div><div class="tll" style="color:var(--text);font-weight:500">You are here</div><div class="tlw">Wk 24</div></div>
+        <div class="ts"><div class="td u"><i class="ti ti-test-pipe" style="font-size:12px"></i></div><div class="tll">Glucose test</div><div class="tlw">Wk 28</div></div>
+        <div class="ts"><div class="td u"><i class="ti ti-dna" style="font-size:12px"></i></div><div class="tll">GBS screen</div><div class="tlw">Wk 36</div></div>
+        <div class="ts"><div class="td u"><i class="ti ti-heart" style="font-size:12px"></i></div><div class="tll">Due date</div><div class="tlw">Sep 14</div></div>
+      </div>
+    </div>
+    <div class="two">
+      <div class="card" style="margin-bottom:0">
+        <p class="ct"><i class="ti ti-circle-check" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Your care checklist</p>
+        <div class="cr"><i class="ti ti-circle-check" style="color:var(--teal);font-size:16px"></i><span class="cl">Folic acid (400mcg daily)</span><span class="cd">Confirmed</span></div>
+        <div class="cr"><i class="ti ti-circle-check" style="color:var(--teal);font-size:16px"></i><span class="cl">Anatomy ultrasound</span><span class="cd">Mar 3</span></div>
+        <div class="cr"><i class="ti ti-circle-check" style="color:var(--teal);font-size:16px"></i><span class="cl">Blood pressure check</span><span class="cd">Normal</span></div>
+        <div class="cr cw"><i class="ti ti-alert-circle" style="color:var(--amber);font-size:16px"></i><span class="cl" style="font-weight:500">Glucose tolerance test</span><span class="cd" style="color:var(--amber)">Due wk 28</span></div>
+        <div class="cr"><i class="ti ti-circle" style="color:var(--text3);font-size:16px"></i><span class="cl" style="color:var(--text2)">GBS screening</span><span class="cd">Wk 36</span></div>
+        <div class="cr"><i class="ti ti-circle" style="color:var(--text3);font-size:16px"></i><span class="cl" style="color:var(--text2)">Birth plan discussion</span><span class="cd">Wk 32</span></div>
+        <p class="src" style="margin-top:.75rem">GDM screen flagged in <span id="p-gdm-pct"></span>% of similar patients in our simulation</p>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <p class="ct"><i class="ti ti-activity" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Your vitals trend</p>
+        <div style="position:relative;width:100%;height:155px"><canvas id="ch-bp" role="img" aria-label="Line chart of blood pressure over prenatal visits">BP readings across prenatal visits.</canvas></div>
+        <div class="leg"><span><span class="lsq" style="background:#378ADD"></span>Systolic</span><span><span class="lsq" style="background:#1D9E75"></span>Diastolic</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <p class="ct"><i class="ti ti-message-circle" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>AI health assistant</p>
+      <div class="aib"><span style="font-weight:500;color:var(--blue)">Reminder:</span> Your glucose tolerance test is coming up at week 28. In our simulation, <span id="p-gdm-msg"></span>% of patients like you had unscreened GDM — this test catches it early. No fasting needed beforehand.</div>
+      <div class="qb"><button class="btn p" onclick="openModal('What to expect — Glucose Tolerance Test','<p>The 1-hour glucose challenge test (GCT) is a simple screening done between weeks 24–28.</p><ul><li>No fasting required beforehand</li><li>You drink a sweet glucose solution</li><li>Blood is drawn 1 hour later</li><li>Results in 1–2 days</li></ul><p style=\"margin-top:.6rem\">If the screen is positive, a 3-hour fasting OGTT confirms diagnosis. Most patients with a positive screen do <em>not</em> have GDM.</p>')">What to expect</button><button class="btn" onclick="openModal('Warning signs to watch','<p>Contact your care team or go to L&amp;D immediately if you experience:</p><ul><li>Severe headache that does not go away</li><li>Vision changes — blurring, spots, or flashes</li><li>Sudden swelling of face, hands, or feet</li><li>Pain in the upper right abdomen</li><li>Decreased fetal movement</li><li>Vaginal bleeding</li></ul><p style=\"margin-top:.6rem\">These may be signs of preeclampsia or other urgent conditions. Do not wait for your next appointment.</p>')">Warning signs to watch</button><button class="btn" onclick="openModal('Nutrition advice for GDM prevention','<p>Evidence-based nutrition tips that reduce GDM risk:</p><ul><li>Choose complex carbs — whole grains, legumes, vegetables</li><li>Limit sugary drinks, juice, and refined carbs</li><li>Eat smaller, more frequent meals (every 3–4 hours)</li><li>Include protein at every meal to steady blood sugar</li><li>30 min of moderate activity most days (walk, swim, prenatal yoga)</li></ul><p style=\"margin-top:.6rem\">A registered dietitian consult is covered by most plans — ask your OB for a referral.</p>')">Nutrition advice</button></div>
+    </div>
+    <div class="card">
+      <p class="ct"><i class="ti ti-chart-bar" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Population context — how patients like you did</p>
+      <div style="position:relative;width:100%;height:180px"><canvas id="ch-disp" role="img" aria-label="Bar chart showing claim rates by race ethnicity baseline vs AI-assisted from simulation">Claim rates by race and ethnicity from simulation data.</canvas></div>
+      <div class="leg"><span><span class="lsq" style="background:#B5D4F4"></span>Baseline</span><span><span class="lsq" style="background:#1D9E75"></span>AI-assisted</span></div>
+      <p class="src">Disparity data from simulation · 10,000 patients · HCUP NIS / CDC 2021 calibration</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const D = {"meta": {"population": 10000, "generated_from": "Synthea-calibrated simulation (HCUP NIS 2021, CDC 2021)", "baseline_claim_rate": 11.2, "ai_claim_rate": 8.7, "claims_prevented": 250, "cost_saved_total": 4625000, "deaths_averted": 7, "claim_rate_reduction_pct": 22.3}, "hospital": {"kpis": {"flags_today": 34, "flags_acted_today": 29, "claims_prevented_mtd": 21, "cost_saved_mtd": 385417, "guideline_adherence": 84, "adherence_baseline": 60, "unresolved_alerts": 3, "active_patients": 14}, "monthly_trend": [{"month": "Jan", "baseline": 934, "ai": 934}, {"month": "Feb", "baseline": 931, "ai": 918}, {"month": "Mar", "baseline": 936, "ai": 901}, {"month": "Apr", "baseline": 929, "ai": 888}, {"month": "May", "baseline": 933, "ai": 871}, {"month": "Jun", "baseline": 930, "ai": 858}], "alerts": [{"patient_id": "P001", "age": "32", "insurance": "Medicaid", "gaps": [{"type": "HTN/preeclampsia protocol", "severity": "critical", "icon": "alert-triangle", "desc": "BP elevated — no treatment order placed. ACOG threshold exceeded."}]}, {"patient_id": "P002", "age": "27", "insurance": "Commercial", "gaps": [{"type": "GBS prophylaxis", "severity": "critical", "icon": "dna", "desc": "GBS positive on chart. No intrapartum antibiotic order."}]}, {"patient_id": "P003", "age": "35", "insurance": "Medicaid", "gaps": [{"type": "GDM screening", "severity": "moderate", "icon": "test-pipe", "desc": "GDM risk — glucose challenge test not ordered by 28 weeks."}]}, {"patient_id": "P004", "age": "29", "insurance": "Commercial", "gaps": [{"type": "Anemia detection", "severity": "moderate", "icon": "droplet", "desc": "Low hemoglobin — no ferrous sulfate prescribed."}]}]}, "insurer": {"kpis": {"network_deliveries": 10000, "cost_saved": 4625000, "ai_coverage_pct": 78, "avg_claim_rate": 8.7, "baseline_claim_rate": 11.2}, "gap_counts": {"GDM screen": 1840, "PPD screen": 2310, "Folic acid": 1120, "HTN protocol": 430, "GBS prophy": 290}, "savings_by_type": [{"label": "Preeclampsia", "saved_m": 1.42}, {"label": "GDM", "saved_m": 0.98}, {"label": "Preterm/NICU", "saved_m": 0.87}, {"label": "C-section", "saved_m": 0.64}, {"label": "PPD", "saved_m": 0.51}, {"label": "Readmit", "saved_m": 0.31}], "hospitals": [{"name": "Hospital A", "deliveries": 4200, "ai_pct": 89, "claim_rate": 7.4, "status": "Top performer"}, {"name": "Hospital B", "deliveries": 3100, "ai_pct": 82, "claim_rate": 8.0, "status": "On track"}, {"name": "Hospital C", "deliveries": 1700, "ai_pct": 54, "claim_rate": 10.8, "status": "Below target"}, {"name": "Hospital D", "deliveries": 1000, "ai_pct": 31, "claim_rate": 12.7, "status": "Action needed"}]}, "disparity": [{"group": "Black non-Hispanic", "baseline": 15.8, "ai": 11.9}, {"group": "Hispanic", "baseline": 12.4, "ai": 9.6}, {"group": "White non-Hispanic", "baseline": 9.1, "ai": 7.3}, {"group": "Asian non-Hispanic", "baseline": 7.8, "ai": 6.4}, {"group": "Other", "baseline": 11.0, "ai": 8.7}]};
+
+function fmt_cost(v){return v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.round(v/1e3)+'k':'$'+Math.round(v)}
+function fmt_num(v){return Math.round(v).toLocaleString()}
+
+let charts={};
+
+function render_hospital(){
+  const h=D.hospital, k=h.kpis;
+  document.getElementById('h-active').textContent = k.active_patients;
+  document.getElementById('h-flags').textContent  = fmt_num(k.flags_today);
+  document.getElementById('h-acted').textContent  = fmt_num(k.flags_acted_today)+' acted on';
+  document.getElementById('h-claims').textContent = fmt_num(k.claims_prevented_mtd);
+  document.getElementById('h-saved').textContent  = fmt_cost(k.cost_saved_mtd)+' saved';
+  document.getElementById('h-adh').textContent    = k.guideline_adherence+'%';
+  document.getElementById('h-adh-sub').textContent= '↑ from '+k.adherence_baseline+'% baseline';
+  document.getElementById('h-unres').textContent  = k.unresolved_alerts;
+
+  const ICONS={'critical':'alert-triangle','moderate':'droplet','resolved':'check'};
+  const COLORS={'critical':'r','moderate':'w','resolved':'t'};
+  const alert_html = h.alerts.map((a,idx)=>{
+    const g=a.gaps[0];
+    const sev=g.severity;
+    const cls=COLORS[sev]||'w';
+    const ic=g.icon||ICONS[sev];
+    return `<div class="ar">
+      <div class="ai i${cls}"><i class="ti ti-${ic}"></i></div>
+      <div class="ab">
+        <p class="an">Patient ${idx+1} · Age ${a.age} · ${a.insurance}</p>
+        <p class="ad">${g.desc}</p>
+        <p class="am">${g.type} · ${sev.charAt(0).toUpperCase()+sev.slice(1)}</p>
+      </div>
+      ${sev==='critical'?`<button class="btn p" onclick="showProtocol(${idx})">View protocol</button>`:`<button class="btn" onclick="showGuideline(${idx})">Guidelines</button>`}
+    </div>`;
+  }).join('');
+  document.getElementById('h-alerts').innerHTML = alert_html||'<p style="font-size:13px;color:var(--text2);padding:8px 0">No critical alerts at this time.</p>';
+
+  const RISK=['High','High','Medium','Low'];
+  const FLAGS=['2 open','1 open','1 open','Clear'];
+  const FCOL=['var(--red)','var(--red)','var(--amber)','var(--teal)'];
+  const RPCL=['rph','rph','rpm','rpl'];
+  const GAs=['28w','36w','22w','30w'];
+  document.getElementById('h-patients').innerHTML = h.alerts.slice(0,4).map((a,i)=>`
+    <div class="pr">
+      <div><p class="pn">Patient ${i+1}</p><p class="pd">Age ${a.age} · ${a.insurance}</p></div>
+      <span style="color:var(--text2)">${GAs[i]||'30w'}</span>
+      <span><span class="rp ${RPCL[i]}">${RISK[i]}</span></span>
+      <span style="color:${FCOL[i]};font-weight:500">${FLAGS[i]}</span>
+      <button class="btn" style="font-size:10px;padding:3px 7px" onclick="showPatient(${i})">View</button>
+    </div>`).join('');
+
+  const m=h.monthly_trend;
+  if(!charts.h) charts.h=new Chart(document.getElementById('ch-h'),{type:'bar',data:{labels:m.map(x=>x.month),datasets:[{label:'Baseline',data:m.map(x=>x.baseline),backgroundColor:'#B5D4F4',borderWidth:0},{label:'AI-assisted',data:m.map(x=>x.ai),backgroundColor:'#1D9E75',borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:10}},title:{display:true,text:'Claims',font:{size:10}}}}}});
+}
+
+function render_insurer(){
+  const ins=D.insurer, m=D.meta;
+  document.getElementById('i-del').textContent   = fmt_num(ins.kpis.network_deliveries);
+  document.getElementById('i-saved').textContent = fmt_cost(ins.kpis.cost_saved);
+  document.getElementById('i-claims').textContent= fmt_num(m.claims_prevented);
+  document.getElementById('i-pct').textContent   = m.claim_rate_reduction_pct+'% reduction';
+  document.getElementById('i-rate').textContent  = m.ai_claim_rate+'%';
+  document.getElementById('i-rate-sub').textContent = '↓ from '+m.baseline_claim_rate+'% baseline';
+
+  const STATUS_CLS={'Top performer':'pl','On track':'pl','Below target':'pw','Action needed':'pa'};
+  const TRENDS={'Top performer':[10,8,7,5,4],'On track':[12,9,8,6,5],'Below target':[10,11,12,10,11],'Action needed':[9,11,13,14,15]};
+  document.getElementById('i-hosp-rows').innerHTML = ins.hospitals.map(h=>{
+    const t=TRENDS[h.status]||[10,10,10,10,10];
+    const spark=t.map(v=>`<span style="height:${v}px"></span>`).join('');
+    const cr_col=h.claim_rate>8?'var(--red)':h.claim_rate>7?'var(--amber)':'var(--teal)';
+    const ai_col=h.ai_pct>75?'var(--teal)':h.ai_pct>60?'var(--amber)':'var(--red)';
+    return `<tr><td><span style="font-weight:500">${h.name}</span></td><td>${fmt_num(h.deliveries)}</td><td style="color:${ai_col}">${h.ai_pct}%</td><td style="color:${cr_col}">${h.claim_rate}%</td><td><div class="spark">${spark}</div></td><td><span class="pill ${STATUS_CLS[h.status]||'pl'}">${h.status}</span></td></tr>`;
+  }).join('');
+
+  const gaps=ins.gap_counts;
+  const glabels=Object.keys(gaps).slice(0,5);
+  const gvals=glabels.map(k=>gaps[k]);
+  if(!charts.ig) charts.ig=new Chart(document.getElementById('ch-ig'),{type:'bar',data:{labels:glabels,datasets:[{data:gvals,backgroundColor:'#85B7EB',borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.x.toLocaleString()+' patients'}}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:10}}}}}});
+
+  const sv=ins.savings_by_type.slice(0,6);
+  if(!charts.is) charts.is=new Chart(document.getElementById('ch-is'),{type:'bar',data:{labels:sv.map(x=>x.label),datasets:[{data:sv.map(x=>x.saved_m),backgroundColor:'#1D9E75',borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.parsed.y.toFixed(2)+'M'}}},scales:{x:{ticks:{font:{size:9}},grid:{display:false}},y:{ticks:{font:{size:9},callback:v=>'$'+v+'M'}}}}});
+}
+
+function render_patient(){
+  const m=D.meta;
+  const gdm_gap=D.insurer.gap_counts['GDM screen']||0;
+  const gdm_pct=Math.round(gdm_gap/m.population*100);
+  document.getElementById('p-gdm-pct').textContent=gdm_pct;
+  document.getElementById('p-gdm-msg').textContent=gdm_pct;
+
+  const disp=D.disparity;
+  const dlabels=disp.map(x=>x.group.replace(' non-Hispanic','').replace('Hispanic','Hispanic'));
+  if(!charts.bp) charts.bp=new Chart(document.getElementById('ch-bp'),{type:'line',data:{labels:['Wk 8','Wk 12','Wk 16','Wk 20','Wk 24'],datasets:[{label:'Systolic',data:[118,120,116,119,122],borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.06)',fill:true,tension:0.35,pointRadius:4,borderWidth:2,borderDash:[]},{label:'Diastolic',data:[75,78,74,76,78],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.04)',fill:true,tension:0.35,pointRadius:4,borderWidth:2,borderDash:[4,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}},grid:{display:false}},y:{min:60,max:145,ticks:{font:{size:9}},title:{display:true,text:'mmHg',font:{size:9}}}}}});
+  if(!charts.disp) charts.disp=new Chart(document.getElementById('ch-disp'),{type:'bar',data:{labels:dlabels,datasets:[{label:'Baseline',data:disp.map(x=>x.baseline),backgroundColor:'#B5D4F4',borderWidth:0},{label:'AI-assisted',data:disp.map(x=>x.ai),backgroundColor:'#1D9E75',borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},scales:{x:{ticks:{font:{size:9},autoSkip:false,maxRotation:25}},y:{ticks:{font:{size:9},callback:v=>v+'%'},title:{display:true,text:'Claim rate %',font:{size:9}}}}}});
+}
+
+const GAs_const=['28w','36w','22w','30w'];
+const RISK_const=['High','High','Medium','Low'];
+const FLAGS_const=['2 open','1 open','1 open','Clear'];
+
+function showPatient(i){
+  const a=D.hospital.alerts[i]||{};
+  openModal('Patient '+(i+1)+' — Chart Summary',
+    '<p><strong>Age:</strong> '+a.age+'&nbsp;|&nbsp;<strong>Insurance:</strong> '+a.insurance+'</p>'+
+    '<p style="margin-top:.5rem"><strong>Gestational age:</strong> '+(GAs_const[i]||'30w')+'</p>'+
+    '<p style="margin-top:.5rem"><strong>Risk level:</strong> '+RISK_const[i]+'</p>'+
+    '<p style="margin-top:.5rem"><strong>Open flags:</strong> '+FLAGS_const[i]+'</p>'+
+    '<p style="margin-top:.75rem;font-size:12px;color:var(--text3)">Full EHR integration would display vitals, labs, orders, and notes here.</p>');
+}
+function showProtocol(idx){
+  const g=(D.hospital.alerts[idx]||{gaps:[{}]}).gaps[0]||{};
+  openModal('ACOG Protocol — '+g.type,
+    '<p><strong>Immediate actions required:</strong></p>'+
+    '<ul><li>Verify BP reading and recheck in 15 minutes</li>'+
+    '<li>Notify attending OB and charge nurse</li>'+
+    '<li>Obtain IV access and draw labs (CBC, CMP, uric acid, LFTs)</li>'+
+    '<li>Initiate magnesium sulfate per ACOG protocol if BP ≥160/110</li>'+
+    '<li>Document in chart and set escalation timer</li></ul>'+
+    '<p style="margin-top:.6rem">Source: ACOG Practice Bulletin No. 222.</p>');
+}
+function showGuideline(idx){
+  const g=(D.hospital.alerts[idx]||{gaps:[{}]}).gaps[0]||{};
+  openModal('Clinical Guideline — '+g.type,
+    '<p>Recommended next steps per ACOG / SMFM guidelines:</p>'+
+    '<ul><li>Review patient chart and confirm diagnosis criteria</li>'+
+    '<li>Order appropriate workup if not already done</li>'+
+    '<li>Document gap closure in EHR care plan</li>'+
+    '<li>Schedule follow-up within 1–2 weeks</li>'+
+    '<li>Engage care coordinator for high-risk patients</li></ul>');
+}
+function openModal(title, body){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+function show(v){
+  ['h','i','p'].forEach(id=>{
+    document.getElementById('v-'+id).style.display=id===v?'block':'none';
+    document.getElementById('t-'+id).className='tab'+(id===v?' on':'');
+  });
+  if(v==='h') render_hospital();
+  if(v==='i') render_insurer();
+  if(v==='p') render_patient();
+}
+show('h');
+</script>
+</body>
+</html>
