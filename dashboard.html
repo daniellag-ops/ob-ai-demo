@@ -106,6 +106,59 @@ h1{font-size:18px;font-weight:500}
 .lsq{width:10px;height:10px;border-radius:2px;display:inline-block}
 .clbl{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px}
 .src{font-size:10px;color:var(--text3);margin-top:.5rem;font-style:italic}
+
+/* ── Hospital: clinical blue, compact, urgent ── */
+body[data-view="h"]{background:#EBF3FD}
+body[data-view="h"] .logo-dot{background:#1D63C9}
+body[data-view="h"] .tab.on{background:#DBEAFE;color:#1D4ED8;font-weight:600}
+body[data-view="h"] .data-badge{background:#DBEAFE;color:#1D4ED8}
+body[data-view="h"] .pill.pl{background:#DBEAFE;color:#1D4ED8}
+body[data-view="h"] .kpis{gap:8px}
+body[data-view="h"] .kpi{background:#fff;border:0.5px solid rgba(37,99,235,.18);padding:.6rem .85rem}
+body[data-view="h"] .kv.b{color:#1D4ED8}
+body[data-view="h"] .kv.r{color:#DC2626;font-size:26px;font-weight:700}
+body[data-view="h"] .card{padding:.7rem .95rem;border-color:rgba(37,99,235,.13);background:#fff}
+body[data-view="h"] .ar{border-left:3px solid var(--border);padding-left:10px}
+body[data-view="h"] .btn.p{background:#DBEAFE;color:#1D4ED8;border-color:#93C5FD}
+body[data-view="h"] .db-ttl{color:#1D4ED8}
+
+/* ── Insurer: indigo, analytical, data-heavy ── */
+body[data-view="i"]{background:#F0EFFF}
+body[data-view="i"] .logo-dot{background:#4F46E5}
+body[data-view="i"] .tab.on{background:#EDE9FE;color:#4F46E5;font-weight:600}
+body[data-view="i"] .data-badge{background:#EDE9FE;color:#4F46E5}
+body[data-view="i"] .pill.pl{background:#EDE9FE;color:#4F46E5}
+body[data-view="i"] .kpi{background:#fff;border:0.5px solid rgba(79,70,229,.18);padding:1rem 1.1rem}
+body[data-view="i"] .kv{color:#4F46E5;font-size:26px;font-weight:700}
+body[data-view="i"] .kv.t{color:#4F46E5}
+body[data-view="i"] .kv.b{color:#4F46E5}
+body[data-view="i"] .card{border-color:rgba(79,70,229,.13);background:#fff}
+body[data-view="i"] .ins-t th{background:#F0EFFF;color:#4F46E5}
+body[data-view="i"] .spark span{background:#7C3AED}
+body[data-view="i"] .db-ttl{color:#4F46E5}
+
+/* ── Patient: emerald, spacious, warm ── */
+body[data-view="p"]{background:#ECFDF5}
+body[data-view="p"] .logo-dot{background:#059669}
+body[data-view="p"] .tab.on{background:#D1FAE5;color:#065F46;font-weight:600}
+body[data-view="p"] .data-badge{background:#D1FAE5;color:#065F46}
+body[data-view="p"] .pill.pw{background:#FEF3C7;color:#92400E}
+body[data-view="p"] .pill.pl{background:#D1FAE5;color:#065F46}
+body[data-view="p"] .card{border-radius:18px;padding:1.25rem 1.5rem;border-color:rgba(5,150,105,.18);background:#fff}
+body[data-view="p"] .ct{font-size:12px;color:#059669;font-weight:600}
+body[data-view="p"] .kpi{border-radius:14px;background:#fff;padding:1rem 1.1rem;border:0.5px solid rgba(5,150,105,.18)}
+body[data-view="p"] .kv{font-size:22px}
+body[data-view="p"] .cr{padding:11px 0;font-size:14px}
+body[data-view="p"] .tll{font-size:12px}
+body[data-view="p"] .td.d{background:#D1FAE5;color:#065F46;border-color:#059669}
+body[data-view="p"] .td.n{background:#D1FAE5;color:#065F46;border-color:#059669}
+body[data-view="p"] .bubble.me{background:#059669}
+body[data-view="p"] .chat-send{background:#059669}
+body[data-view="p"] .chat-input:focus{border-color:#059669}
+body[data-view="p"] .msg-av.me{background:#D1FAE5;color:#065F46}
+body[data-view="p"] .db-ttl{color:#065F46;font-size:18px}
+body[data-view="p"] .db-sub{font-size:13px}
+
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
 .modal-box{background:var(--bg);border-radius:var(--rl);padding:1.5rem;max-width:440px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);position:relative;max-height:80vh;overflow-y:auto}
@@ -442,6 +495,7 @@ function show(v){
     document.getElementById('v-'+id).style.display=id===v?'block':'none';
     document.getElementById('t-'+id).className='tab'+(id===v?' on':'');
   });
+  document.body.setAttribute('data-view',v);
   if(v==='h') render_hospital();
   if(v==='i') render_insurer();
   if(v==='p') render_patient();
