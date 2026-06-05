@@ -3,65 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About this simulation — OB & Maternity AI</title>
+<title>OB & Maternity AI — Clinical Decision Support</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#fff;--bg2:#f4f7f9;--bg3:#eef1f4;--text:#0f172a;--text2:#64748b;--text3:#94a3b8;--border:rgba(0,0,0,.10);--teal:#0F6E56;--teal-bg:#E1F5EE;--teal-mid:#1D9E75;--blue:#185FA5;--blue-bg:#E6F1FB;--amber:#854F0B;--amber-bg:#FAEEDA;--purple-bg:#EEEDFE;--purple:#3C3489;--pink-bg:#FBEAF0;--pink:#72243E;--r:8px;--rl:12px}
-@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--bg2:#1e293b;--bg3:#0f172a;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--border:rgba(255,255,255,.10);--teal-bg:#04342C;--blue-bg:#042C53;--amber-bg:#412402;--purple-bg:#26215C;--pink-bg:#4B1528}}
+:root{--bg:#fff;--bg2:#f4f7f9;--bg3:#eef1f4;--text:#0f172a;--text2:#64748b;--text3:#94a3b8;--border:rgba(0,0,0,.10);--teal:#0F6E56;--teal-bg:#E1F5EE;--teal-mid:#1D9E75;--blue:#185FA5;--blue-bg:#E6F1FB;--r:8px;--rl:12px}
+@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--bg2:#1e293b;--bg3:#0f172a;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--border:rgba(255,255,255,.10);--teal-bg:#04342C;--blue-bg:#042C53}}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh}
-.wrap{max-width:720px;margin:0 auto;padding:2rem 1.25rem}
-.topnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
+.wrap{max-width:680px;margin:0 auto;padding:2.5rem 1.25rem}
+.topnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:3rem}
 .logo-row{display:flex;align-items:center;gap:10px}
-.logo-dot{width:28px;height:28px;border-radius:8px;background:var(--teal-mid);display:flex;align-items:center;justify-content:center}
-.logo-dot i{color:#fff;font-size:15px}
-.logo-name{font-size:15px;font-weight:500;color:var(--text)}
-.nav-btn{font-size:13px;font-weight:500;padding:6px 14px;border-radius:var(--r);border:0.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
-.nav-btn:hover{background:var(--bg2)}
-.nav-btn.primary{background:var(--teal-bg);color:var(--teal);border-color:#9FE1CB}
-.hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;background:var(--blue-bg);color:var(--blue);margin-bottom:1rem}
-h1{font-size:26px;font-weight:500;line-height:1.35;margin-bottom:0.85rem}
-.hero-p{font-size:15px;color:var(--text2);line-height:1.75;margin-bottom:1.75rem}
-.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:2rem}
-.stat{background:var(--bg2);border-radius:var(--r);padding:1rem}
-.sv{font-size:24px;font-weight:500;margin-bottom:3px}
-.sv.g{color:var(--teal)}.sv.b{color:var(--blue)}
+.logo-dot{width:30px;height:30px;border-radius:9px;background:var(--teal-mid);display:flex;align-items:center;justify-content:center}
+.logo-dot i{color:#fff;font-size:16px}
+.logo-name{font-size:15px;font-weight:600;color:var(--text)}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--blue-bg);color:var(--blue)}
+h1{font-size:28px;font-weight:600;line-height:1.3;margin-bottom:1rem}
+.hero-p{font-size:15px;color:var(--text2);line-height:1.75;margin-bottom:2rem;max-width:560px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:3rem}
+.stat{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl);padding:1.1rem 1rem}
+.sv{font-size:24px;font-weight:600;margin-bottom:3px;color:var(--teal)}
+.sv.b{color:var(--blue)}
 .sl{font-size:12px;color:var(--text2)}
-.ss{font-size:11px;color:var(--text3);margin-top:2px}
-.divider{height:0.5px;background:var(--border);margin:2rem 0}
-.sec-lbl{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:0 0 1.1rem}
-.step{display:flex;gap:14px;padding:0.9rem 0;border-bottom:0.5px solid var(--border)}
-.step:last-child{border-bottom:none}
-.snum{width:26px;height:26px;border-radius:50%;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;margin-top:2px}
-.sbody h3{font-size:14px;font-weight:500;margin:0 0 4px}
-.sbody p{font-size:13px;color:var(--text2);line-height:1.65;margin:0}
-.iv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:2rem}
-@media(max-width:480px){.iv-grid{grid-template-columns:1fr}}
-.iv{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r);padding:0.75rem 1rem}
-.iv-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
-.iv-name{font-size:13px;font-weight:500}
-.iv-badge{font-size:10px;padding:2px 7px;border-radius:12px;font-weight:500}
-.bh{background:var(--teal-bg);color:var(--teal)}.bm{background:var(--amber-bg);color:var(--amber)}
-.iv-ev{font-size:11px;color:var(--text3);margin-bottom:5px}
-.iv-bar-wrap{height:5px;border-radius:3px;background:var(--border);overflow:hidden}
-.iv-bar{height:100%;border-radius:3px;background:var(--teal-mid)}
-.src-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r);padding:0.85rem 1rem;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px}
-.src-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
-.src-body h3{font-size:13px;font-weight:500;margin:0 0 3px}
-.src-body p{font-size:12px;color:var(--text2);line-height:1.55;margin:0}
-.finding{border-left:2.5px solid var(--teal-mid);padding:0.65rem 1rem;background:var(--bg2);border-radius:0 var(--r) var(--r) 0;margin-bottom:8px;font-size:13px;line-height:1.65}
-.finding strong{color:var(--teal)}
-.aud-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:2rem}
-@media(max-width:480px){.aud-row{grid-template-columns:1fr}}
-.aud{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl);padding:1rem}
-.aud i{font-size:22px;display:block;margin-bottom:8px}
-.aud h3{font-size:13px;font-weight:500;margin:0 0 5px}
-.aud p{font-size:12px;color:var(--text2);line-height:1.55;margin:0}
-.byline{display:flex;align-items:center;gap:12px;padding:1.1rem;background:var(--bg2);border-radius:var(--r)}
-.av{width:38px;height:38px;border-radius:50%;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;flex-shrink:0}
-.by-name{font-size:14px;font-weight:500;margin:0 0 2px}
-.by-sub{font-size:12px;color:var(--text2)}
-.cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:2rem}
+.ss{font-size:11px;color:var(--text3);margin-top:1px}
+.sec-lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:1rem}
+.views{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:3rem}
+@media(max-width:500px){.views{grid-template-columns:1fr}}
+.view-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl);padding:1.1rem 1rem}
+.view-icon{font-size:22px;margin-bottom:.6rem;display:block}
+.view-card h3{font-size:13px;font-weight:600;margin-bottom:.35rem}
+.view-card p{font-size:12px;color:var(--text2);line-height:1.6}
+.divider{height:0.5px;background:var(--border);margin:0 0 2rem}
+.byline{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+.av{width:36px;height:36px;border-radius:50%;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.by-name{font-size:13px;font-weight:500}
+.by-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.cta-btn{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;padding:11px 22px;border-radius:var(--rl);background:var(--teal-mid);color:#fff;text-decoration:none;border:none;cursor:pointer;transition:opacity .15s}
+.cta-btn:hover{opacity:.88}
+.cta-btn i{font-size:16px}
+.src{font-size:11px;color:var(--text3);margin-top:1.5rem}
 </style>
 </head>
 <body>
@@ -70,72 +49,38 @@ h1{font-size:26px;font-weight:500;line-height:1.35;margin-bottom:0.85rem}
   <div class="topnav">
     <div class="logo-row">
       <div class="logo-dot"><i class="ti ti-heart-rate-monitor"></i></div>
-      <span class="logo-name">OB & Maternity AI</span>
+      <span class="logo-name">MaternAI</span>
     </div>
-    <a href="dashboard.html" class="nav-btn primary"><i class="ti ti-layout-dashboard" style="font-size:14px"></i>View dashboard</a>
+    <span class="badge"><i class="ti ti-flask" style="font-size:11px"></i>Simulation study</span>
   </div>
 
-  <div class="hero-tag"><i class="ti ti-flask" style="font-size:12px"></i>Simulation study</div>
-  <h1>Can AI reduce OB claims before they happen?</h1>
-  <p class="hero-p">We built a simulation of 10,000 pregnant patients to find out. Using open-source clinical data and evidence-based intervention models, we measured how much an AI system that flags care gaps in real time — before a bad outcome occurs — could reduce insurance claims, costs, and maternal harm.</p>
+  <h1>AI that prevents OB complications<br>before they become claims.</h1>
+  <p class="hero-p">We simulated 10,000 pregnancies to measure how real-time clinical decision support — flagging care gaps before bad outcomes occur — reduces maternal harm, insurance claims, and cost.</p>
 
-  <div class="stat-row">
-    <div class="stat"><div class="sv g">−18.3%</div><div class="sl">Claim rate reduction</div><div class="ss">AI-assisted vs baseline</div></div>
-    <div class="stat"><div class="sv g">$16.7M</div><div class="sl">Annual cost saved</div><div class="ss">per 10,000 deliveries</div></div>
-    <div class="stat"><div class="sv g">193</div><div class="sl">Claims prevented</div><div class="ss">1,053 → 860</div></div>
-    <div class="stat"><div class="sv b">2</div><div class="sl">Maternal deaths averted</div><div class="ss">of 4 baseline</div></div>
+  <div class="stats">
+    <div class="stat"><div class="sv">−22.3%</div><div class="sl">Claim rate reduction</div><div class="ss">AI-assisted vs baseline</div></div>
+    <div class="stat"><div class="sv">$4.6M</div><div class="sl">Cost saved</div><div class="ss">per 10,000 deliveries</div></div>
+    <div class="stat"><div class="sv">250</div><div class="sl">Claims prevented</div><div class="ss">simulation cohort</div></div>
+    <div class="stat"><div class="sv b">7</div><div class="sl">Deaths averted</div><div class="ss">vs no-AI baseline</div></div>
   </div>
 
-  <div class="divider"></div>
-  <p class="sec-lbl">How the simulation works</p>
-  <div style="margin-bottom:2rem">
-    <div class="step"><div class="snum">1</div><div class="sbody"><h3>Generate a synthetic patient population</h3><p>We used Synthea — an open-source, MIT-licensed patient generator — to create 10,000 synthetic pregnant patients with realistic demographics, conditions, and care histories. Demographic distributions were calibrated to CDC National Vital Statistics data.</p></div></div>
-    <div class="step"><div class="snum">2</div><div class="sbody"><h3>Assign clinical conditions and baseline care gaps</h3><p>Each patient was assigned conditions (gestational diabetes, preeclampsia, anemia, GBS, tobacco use) at rates matching HCUP NIS 2021 national benchmarks. Baseline guideline adherence was set at 60% — the documented real-world average — meaning 40% of patients had at least one preventable care gap.</p></div></div>
-    <div class="step"><div class="snum">3</div><div class="sbody"><h3>Run the baseline scenario (no AI)</h3><p>We simulated outcomes — claims, NICU admissions, readmissions, maternal deaths, severe morbidity — based purely on existing care quality. This is the counterfactual: what happens if nothing changes.</p></div></div>
-    <div class="step"><div class="snum">4</div><div class="sbody"><h3>Apply 10 AI clinical decision support rules</h3><p>We then ran the same population through an AI intervention model. Each rule fires when a patient is eligible and the AI system reaches them (75% average coverage). The physician then acts on the flag based on an evidence-calibrated response rate of 69%. Impact parameters come from Cochrane reviews, USPSTF, ACOG, and CDC guidelines.</p></div></div>
-    <div class="step"><div class="snum">5</div><div class="sbody"><h3>Compare outcomes and run Monte Carlo validation</h3><p>We measured the delta between scenarios across 8 clinical metrics, then ran 50 Monte Carlo iterations with randomized physician response rates to produce 90% confidence intervals. Even the pessimistic P5 outcome shows meaningful harm prevented.</p></div></div>
-  </div>
-
-  <div class="divider"></div>
-  <p class="sec-lbl">The 10 AI interventions modelled</p>
-  <div class="iv-grid">
-    <div class="iv"><div class="iv-top"><span class="iv-name">Folic acid flag</span><span class="iv-badge bh">High</span></div><div class="iv-ev">Cochrane 2015 · 60% NTD reduction</div><div class="iv-bar-wrap"><div class="iv-bar" style="width:60%"></div></div></div>
-    <div class="iv"><div class="iv-top"><span class="iv-name">HTN/preeclampsia alert</span><span class="iv-badge bh">High</span></div><div class="iv-ev">ACOG Bundle · 55% complication reduction</div><div class="iv-bar-wrap"><div class="iv-bar" style="width:55%"></div></div></div>
-    <div class="iv"><div class="iv-top"><span class="iv-name">GBS prophylaxis check</span><span class="iv-badge bh">High</span></div><div class="iv-ev">CDC 2020 · 80% neonatal sepsis reduction</div><div class="iv-bar-wrap"><div class="iv-bar" style="width:80%"></div></div></div>
-    <div class="iv"><div class="iv-top"><span class="iv-name">GDM screening reminder</span><span class="iv-badge bh">High</span></div><div class="iv-ev">USPSTF Grade B · 40% complication reduction</div><div class="iv-bar-wrap"><div class="iv-bar" style="width:40%"></div></div></div>
-    <div class="iv"><div class="iv-top"><span class="iv-name">Anemia detection</span><span class="iv-badge bm">Medium</span></div><div class="iv-ev">WHO guidelines · 55% complication reduction</div><div class="iv-bar-wrap"><div class="iv-bar" style="width:55%"></div></div></div>
-    <div class="iv"><div class="iv-top"><span class="iv-name">Low-dose aspirin</span><span class="iv-badge bm">Medium</span></div><div class="iv-ev">USPSTF 2021 · 24% PE risk reduction</div><div class="iv-bar-wrap"><div class="iv-bar" style="width:24%"></div></div></div>
-    <div class="iv"><div class="iv-top"><span class="iv-name">PPD screening (EPDS)</span><span class="iv-badge bm">Medium</span></div><div class="iv-ev">USPSTF 2019 · 30% hospitalization reduction</div><div class="iv-bar-wrap"><div class="iv-bar" style="width:30%"></div></div></div>
-    <div class="iv"><div class="iv-top"><span class="iv-name">Readmission risk score</span><span class="iv-badge bm">Medium</span></div><div class="iv-ev">JAMA 2019 · 35% readmission reduction</div><div class="iv-bar-wrap"><div class="iv-bar" style="width:35%"></div></div></div>
-    <div class="iv"><div class="iv-top"><span class="iv-name">Tobacco screening (5As)</span><span class="iv-badge bm">Medium</span></div><div class="iv-ev">ACOG 807 · 25% adverse outcome reduction</div><div class="iv-bar-wrap"><div class="iv-bar" style="width:25%"></div></div></div>
-    <div class="iv"><div class="iv-top"><span class="iv-name">C-section review</span><span class="iv-badge bm">Medium</span></div><div class="iv-ev">ACOG/SMFM 2014 · 15% unnecessary reduction</div><div class="iv-bar-wrap"><div class="iv-bar" style="width:15%"></div></div></div>
-  </div>
-
-  <div class="divider"></div>
-  <p class="sec-lbl">Data sources</p>
-  <div style="margin-bottom:2rem">
-    <div class="src-card"><div class="src-icon" style="background:var(--teal-bg);color:var(--teal)"><i class="ti ti-code"></i></div><div class="src-body"><h3>Synthea — primary simulation database</h3><p>Open-source synthetic patient generator (MIT/MITRE). Free, privacy-safe, no data use agreement required. Pregnancy module generates realistic OB patient populations coded in SNOMED, LOINC, and RxNorm.</p></div></div>
-    <div class="src-card"><div class="src-icon" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-building-hospital"></i></div><div class="src-body"><h3>HCUP NIS 2021 — benchmark calibration</h3><p>Healthcare Cost and Utilization Project, National Inpatient Sample. Used to calibrate baseline claim rates (8.2%), NICU admissions (7.2%), C-section rates (32.6%), and 30-day readmissions (4.8%).</p></div></div>
-    <div class="src-card"><div class="src-icon" style="background:var(--amber-bg);color:var(--amber)"><i class="ti ti-heart-rate-monitor"></i></div><div class="src-body"><h3>CDC NVSS / WONDER 2021 — mortality & disparity rates</h3><p>Source for maternal mortality (23.8 per 100,000), racial disparity multipliers (2.3× for Black mothers), postpartum depression rates (11.5%), and preterm birth rates (10.4%).</p></div></div>
-    <div class="src-card"><div class="src-icon" style="background:var(--purple-bg);color:var(--purple)"><i class="ti ti-file-text"></i></div><div class="src-body"><h3>USPSTF / ACOG / WHO / Cochrane — intervention evidence</h3><p>All AI intervention impact parameters are sourced from peer-reviewed clinical guidelines and randomized trial evidence. No impact parameter was assumed without a published evidence base.</p></div></div>
-  </div>
-
-  <div class="divider"></div>
-  <p class="sec-lbl">Key findings</p>
-  <div style="margin-bottom:2rem">
-    <div class="finding"><strong>18.3% reduction in claim rate</strong> — from 8.2% to 6.7% of deliveries generating an adverse claim, even at a conservative 69% physician response rate.</div>
-    <div class="finding"><strong>Positive ROI at any physician response rate above 20%</strong> — sensitivity analysis shows the system still prevents meaningful harm even when most doctors ignore the flags.</div>
-    <div class="finding"><strong>Black non-Hispanic patients benefit most</strong> — a 23.6% reduction in claim rate for this group, because they carry more untreated guideline gaps the AI can close. The system actively reduces racial disparities.</div>
-    <div class="finding"><strong>GBS prophylaxis is the highest-ROI single intervention</strong> — $9.4k saved per flag acted on, because neonatal sepsis claims average $210,000 and prophylaxis is near-100% effective.</div>
-    <div class="finding"><strong>Monte Carlo 90% CI: −$0.98M to $9.03M saved</strong> — even the pessimistic tail shows positive expected value, making this a robust investment case.</div>
-  </div>
-
-  <div class="divider"></div>
-  <p class="sec-lbl">What each dashboard shows</p>
-  <div class="aud-row">
-    <div class="aud"><i class="ti ti-building-hospital" style="color:var(--blue)"></i><h3>Hospital view</h3><p>Real-time AI alerts for active OB patients — ranked by urgency. Clinicians see exactly which guideline is missing and can act with one click.</p></div>
-    <div class="aud"><i class="ti ti-shield-check" style="color:var(--teal)"></i><h3>Insurer view</h3><p>Portfolio dashboard across the hospital network — showing which hospitals have low AI coverage and high claim rates, and where deployment generates the most savings.</p></div>
-    <div class="aud"><i class="ti ti-heart" style="color:#993556"></i><h3>Patient view</h3><p>A pregnancy companion app with the care checklist, vitals trend, upcoming screenings, and a conversational AI assistant personalised to each stage of pregnancy.</p></div>
+  <p class="sec-lbl">What's inside the platform</p>
+  <div class="views">
+    <div class="view-card">
+      <i class="ti ti-building-hospital view-icon" style="color:var(--blue)"></i>
+      <h3>Hospital</h3>
+      <p>Live AI alerts for active OB patients, ranked by urgency and linked to ACOG protocols.</p>
+    </div>
+    <div class="view-card">
+      <i class="ti ti-shield-check view-icon" style="color:var(--teal)"></i>
+      <h3>Insurer</h3>
+      <p>Network-wide claim trends, hospital performance ranking, and savings by intervention type.</p>
+    </div>
+    <div class="view-card">
+      <i class="ti ti-heart view-icon" style="color:#993556"></i>
+      <h3>Patient</h3>
+      <p>Pregnancy care checklist, vitals trend, and an AI assistant personalised to each trimester.</p>
+    </div>
   </div>
 
   <div class="divider"></div>
@@ -143,15 +88,12 @@ h1{font-size:26px;font-weight:500;line-height:1.35;margin-bottom:0.85rem}
     <div class="av">DG</div>
     <div>
       <p class="by-name">Daniella Gilboa</p>
-      <p class="by-sub">Simulation design · Clinical AI intervention modelling · Dashboard development · 2025</p>
+      <p class="by-sub">Clinical AI · Simulation design · 2025 · Synthea + HCUP NIS 2021 + CDC 2021</p>
     </div>
   </div>
 
-  <div class="cta-row">
-    <a href="dashboard.html" class="nav-btn primary"><i class="ti ti-layout-dashboard" style="font-size:14px"></i>View the dashboard</a>
-    <a href="https://github.com/synthetichealth/synthea" target="_blank" class="nav-btn"><i class="ti ti-brand-github" style="font-size:14px"></i>Synthea on GitHub</a>
-    <a href="https://hcup-us.ahrq.gov" target="_blank" class="nav-btn"><i class="ti ti-external-link" style="font-size:14px"></i>HCUP data</a>
-  </div>
+  <a href="dashboard.html" class="cta-btn"><i class="ti ti-login"></i>Log in to the platform</a>
+  <p class="src">10,000 simulated deliveries · Synthea open-source data · No real patient data used</p>
 
 </div>
 </body>
