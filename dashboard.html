@@ -345,39 +345,8 @@ function render_patient(){
   if(!charts.disp) charts.disp=new Chart(document.getElementById('ch-disp'),{type:'bar',data:{labels:dlabels,datasets:[{label:'Baseline',data:disp.map(x=>x.baseline),backgroundColor:'#B5D4F4',borderWidth:0},{label:'AI-assisted',data:disp.map(x=>x.ai),backgroundColor:'#1D9E75',borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},scales:{x:{ticks:{font:{size:9},autoSkip:false,maxRotation:25}},y:{ticks:{font:{size:9},callback:v=>v+'%'},title:{display:true,text:'Claim rate %',font:{size:9}}}}}});
 }
 
-const YOGEV_QA=[
-  {k:['glucose','gdm','sugar','tolerance','sweet drink'],
-   r:"The glucose challenge test at week 28 is quick and easy — you drink a sweet solution and have blood drawn one hour later, no fasting required. A positive screen just means we do a follow-up 3-hour test; most patients who screen positive do not have GDM. Catching it early makes a big difference."},
-  {k:['warning','danger','emergency','urgent','bleed','headache','vision','swelling','pressure','pain under'],
-   r:"Please go straight to labor & delivery — don't wait for an appointment — if you have: a severe headache that won't go away, vision changes or spots, sudden swelling of the face or hands, pain under the right ribs, vaginal bleeding, or significantly reduced fetal movement. Trust your instincts."},
-  {k:['eat','food','diet','nutrition','meal','carb','sugar','juice'],
-   r:"Focus on complex carbohydrates — whole grains, legumes, vegetables — paired with protein at every meal. Limit fruit juice and refined carbs. Eating smaller meals every 3–4 hours keeps blood sugar stable. If you'd like, I can refer you to our dietitian — it's covered by most plans."},
-  {k:['exercise','walk','swim','gym','sport','activity','yoga','pilates'],
-   r:"Exercise is excellent during pregnancy. Aim for 30 minutes of moderate activity most days — walking, swimming, and prenatal yoga are all safe. Avoid contact sports and lying flat on your back after week 20. Stop and call us if you feel dizzy, short of breath, or have chest pain."},
-  {k:['weight','gain','kg','pounds','scale','heavy'],
-   r:"For a normal pre-pregnancy BMI, we expect roughly 11–16 kg total, with most of the gain in the second and third trimester. Week-to-week variation is normal — monthly trends matter more. If you're gaining faster than expected, let's discuss it at your next visit."},
-  {k:['pain','cramp','ache','pressure','round ligament','sharp'],
-   r:"Some lower abdominal pressure and round ligament pain are completely normal at week 24. What I want you to watch for: persistent or sharp one-sided pain, regular contractions before week 37, or pain with fever or bleeding — those warrant an immediate call to us."},
-  {k:['sleep','rest','insomnia','tired','fatigue','exhausted'],
-   r:"Sleep gets harder as the belly grows — this is completely normal. Try sleeping on your left side with a pillow between your knees. Avoid screens for 30 minutes before bed, and short naps are fine. Fatigue at this stage is your body doing important work — be gentle with yourself."},
-  {k:['kick','movement','baby','fetal','move','still','quiet'],
-   r:"By week 24 you should feel regular movement. A useful rule: aim to feel 10 movements within 2 hours when the baby is typically active. If there's a noticeable decrease compared to your usual pattern, contact us or come in — it's never a bother and we'd rather check."},
-  {k:['week 28','next visit','appointment','next week','when do i come','next appointment'],
-   r:"At your week 28 visit we'll do the glucose tolerance test, check blood pressure and weight, review labs, and give you the Tdap vaccine and Rh immunoglobulin if needed. It's also a great time to start talking about your birth preferences. Plan about 90 minutes for the visit."},
-  {k:['medication','medicine','drug','pill','supplement','vitamin','tylenol','paracetamol','ibuprofen'],
-   r:"Continue your prenatal vitamins with folic acid daily. Paracetamol (Tylenol) is safe for minor discomforts — avoid ibuprofen and aspirin unless I've specifically prescribed them. Always check with me or the pharmacist before starting anything new, including herbal supplements."},
-  {k:['hi','hello','hey','shalom','morning','afternoon','evening','how are you'],
-   r:"Hello Maya! I'm glad you reached out. You're doing really well at week 24. Is there something specific on your mind, or a symptom you'd like to go through together?"},
-  {k:['thank','thanks','toda','appreciate'],
-   r:"You're very welcome, Maya. That's what I'm here for. Don't hesitate to message again — no question is too small during pregnancy."},
-];
-const YOGEV_DEFAULT="That's an important question, Maya. Without a full clinical picture I want to be careful — but please don't hesitate to call the clinic directly if you're worried. For anything that feels urgent, go straight to labor & delivery. Can you tell me more about what you're experiencing?";
+let chatHistory=[];
 
-function getYogevReply(msg){
-  const lc=msg.toLowerCase();
-  for(const qa of YOGEV_QA){ if(qa.k.some(k=>lc.includes(k))) return qa.r; }
-  return YOGEV_DEFAULT;
-}
 function addMsg(text,role){
   const box=document.getElementById('chat-box');
   const wrap=document.createElement('div');
@@ -388,24 +357,40 @@ function addMsg(text,role){
   box.appendChild(wrap);
   box.scrollTop=box.scrollHeight;
 }
-function sendChat(preset){
+
+async function sendChat(preset){
   const inp=document.getElementById('chat-input');
   const msg=preset||inp.value.trim();
   if(!msg)return;
   inp.value='';
+  chatHistory.push({role:'user',content:msg});
   addMsg(msg,'me');
   const box=document.getElementById('chat-box');
   const t=document.createElement('div');
   t.className='chat-msg'; t.id='typing-ind';
   t.innerHTML='<div class="msg-av doc">YY</div><div class="bubble doc typing">Prof. Yogev is typing…</div>';
   box.appendChild(t); box.scrollTop=box.scrollHeight;
-  setTimeout(()=>{
+  try{
+    const res=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:chatHistory.slice(-10)})
+    });
+    const data=await res.json();
+    const reply=data.reply;
+    chatHistory.push({role:'assistant',content:reply});
     const el=document.getElementById('typing-ind'); if(el)el.remove();
-    addMsg(getYogevReply(msg),'doc');
-  }, 850+Math.random()*550);
+    addMsg(reply,'doc');
+  }catch(e){
+    const el=document.getElementById('typing-ind'); if(el)el.remove();
+    addMsg("I'm having trouble connecting right now. If this is urgent, please call the clinic directly.",'doc');
+  }
 }
+
 function initChat(){
-  addMsg("Hello Maya! I'm Prof. Yariv Yogev, Chairman of Lis Hospital for Women at Tel Aviv Sourasky Medical Center. You're doing great at week 24 — everything looks on track. I see your glucose tolerance test is coming up at week 28. Feel free to ask me anything at all.",'doc');
+  const greeting="Hello Maya! I'm Prof. Yariv Yogev, Chairman of Lis Hospital for Women at Tel Aviv Sourasky Medical Center. You're doing great at week 24 — everything looks on track. I see your glucose tolerance test is coming up at week 28. Feel free to ask me anything at all.";
+  chatHistory=[{role:'assistant',content:greeting}];
+  addMsg(greeting,'doc');
 }
 
 const GAs_const=['28w','36w','22w','30w'];
