@@ -131,6 +131,33 @@ h1{font-size:18px;font-weight:500}
 .rx-dose{font-size:11px;color:var(--text3)}
 .rx-btn{font-size:11px;padding:5px 12px;border-radius:20px;background:var(--teal-mid);color:#fff;border:none;cursor:pointer;white-space:nowrap;transition:all .2s}
 .rx-btn.requested{background:var(--teal-bg);color:var(--teal);cursor:default}
+.local-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.local-row:last-child{border-bottom:none}
+.local-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#fff}
+.local-name{font-size:13px;font-weight:500}
+.local-meta{font-size:11px;color:var(--text3);margin-top:1px}
+.local-hi{font-size:11px;padding:4px 12px;border-radius:20px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap}
+.local-hi:hover{background:var(--bg2)}
+.local-hi.sent{background:var(--teal-bg);color:var(--teal);border-color:#9FE1CB;cursor:default}
+.comm-see-more{margin-top:.75rem;font-size:12px;color:var(--text2);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0}
+.comm-see-more:hover{color:var(--text)}
+.global-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:.25rem}
+.gs{background:var(--bg2);border-radius:var(--r);padding:.75rem .85rem;text-align:center}
+.gs-v{font-size:18px;font-weight:600;color:var(--teal);margin-bottom:2px}
+.gs-l{font-size:11px;color:var(--text2)}
+.feed-post{padding:10px 0;border-bottom:0.5px solid var(--border)}
+.feed-post:last-child{border-bottom:none}
+.feed-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.feed-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.feed-who{font-size:12px;font-weight:500}
+.feed-when{font-size:11px;color:var(--text3);margin-left:auto}
+.feed-text{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:6px}
+.feed-actions{display:flex;gap:12px}
+.feed-act{font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0}
+.feed-act:hover{color:var(--text2)}
+.feed-act.liked{color:var(--red)}
+.comm-post-btn{margin-top:1rem;width:100%;padding:10px;border-radius:8px;border:0.5px dashed var(--border2);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.comm-post-btn:hover{background:var(--bg2)}
 
 /* ── Hospital: clinical blue, compact, urgent ── */
 body[data-view="h"]{background:#EBF3FD}
@@ -349,11 +376,18 @@ body[data-view="p"] .db-sub{font-size:13px}
       <p class="src" style="margin-top:.75rem">Delivered to your door within 4 hours · Approved by Dr. Chen · Powered by Maccabi Pharma</p>
     </div>
 
+    <div class="card" style="margin-top:1rem">
+      <p class="ct"><i class="ti ti-map-pin" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Women near you — also at week 24</p>
+      <div id="local-community"></div>
+      <button class="comm-see-more" onclick="toggleLocal(this)">See all 12 women nearby <i class="ti ti-chevron-down" style="font-size:11px"></i></button>
+    </div>
+
     <div class="card">
-      <p class="ct"><i class="ti ti-chart-bar" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Population context — how patients like you did</p>
-      <div style="position:relative;width:100%;height:180px"><canvas id="ch-disp" role="img" aria-label="Bar chart showing claim rates by race ethnicity baseline vs AI-assisted from simulation">Claim rates by race and ethnicity from simulation data.</canvas></div>
-      <div class="leg"><span><span class="lsq" style="background:#B5D4F4"></span>Baseline</span><span><span class="lsq" style="background:#1D9E75"></span>AI-assisted</span></div>
-      <p class="src">Disparity data from simulation · 10,000 patients · HCUP NIS / CDC 2021 calibration</p>
+      <p class="ct"><i class="ti ti-world" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Global community</p>
+      <div class="global-stats" id="global-stats"></div>
+      <div style="margin:1rem 0 .5rem;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Recent posts</div>
+      <div id="global-feed"></div>
+      <button class="comm-post-btn" onclick="openModal('Join the conversation','<p>Community posting is coming soon. You will be able to share experiences, ask questions, and support other SAFE OB patients anonymously.</p><p style=\"margin-top:.6rem\">Want early access? Ask your care team to enable it for your account.</p>')"><i class="ti ti-pencil" style="font-size:13px"></i>Share something with the community</button>
     </div>
   </div>
 </div>
@@ -442,17 +476,77 @@ function render_insurer(){
   if(!charts.is) charts.is=new Chart(document.getElementById('ch-is'),{type:'bar',data:{labels:sv.map(x=>x.label),datasets:[{data:sv.map(x=>x.saved_m),backgroundColor:'#1D9E75',borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.parsed.y.toFixed(2)+'M'}}},scales:{x:{ticks:{font:{size:9}},grid:{display:false}},y:{ticks:{font:{size:9},callback:v=>'$'+v+'M'}}}}});
 }
 
+const LOCAL_MEMBERS=[
+  {name:'Noa S.',week:24,city:'Tel Aviv',color:'#7C3AED',note:'First pregnancy'},
+  {name:'Tamar R.',week:24,city:'Ramat Gan',color:'#059669',note:'Due Sep 18'},
+  {name:'Shira K.',week:23,city:'Tel Aviv',color:'#DB2777',note:'Second pregnancy'},
+];
+const GLOBAL_POSTS=[
+  {anon:'Maya W., week 25',color:'#2563EB',text:'Anyone else finding it hard to sleep on their left side? My back is killing me after week 20.',likes:14,replies:8,ago:'2h'},
+  {anon:'Anonymous, week 24',color:'#7C3AED',text:'Just had my anatomy scan and everything looked great! So relieved. Sending good vibes to everyone waiting for theirs 💙',likes:31,replies:5,ago:'5h'},
+  {anon:'Sarah M., week 26',color:'#059669',text:'My glucose test is next week and I\'m nervous. Has anyone done it? Is it really that bad?',likes:9,replies:17,ago:'1d'},
+];
+
 function render_patient(){
   const m=D.meta;
   const gdm_gap=D.insurer.gap_counts['GDM screen']||0;
   const gdm_pct=Math.round(gdm_gap/m.population*100);
   document.getElementById('p-gdm-pct').textContent=gdm_pct;
   if(!document.getElementById('chat-box').hasChildNodes()) initChat();
-
-  const disp=D.disparity;
-  const dlabels=disp.map(x=>x.group.replace(' non-Hispanic','').replace('Hispanic','Hispanic'));
   if(!charts.bp) charts.bp=new Chart(document.getElementById('ch-bp'),{type:'line',data:{labels:['Wk 8','Wk 12','Wk 16','Wk 20','Wk 24'],datasets:[{label:'Systolic',data:[118,120,116,119,122],borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.06)',fill:true,tension:0.35,pointRadius:4,borderWidth:2,borderDash:[]},{label:'Diastolic',data:[75,78,74,76,78],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.04)',fill:true,tension:0.35,pointRadius:4,borderWidth:2,borderDash:[4,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}},grid:{display:false}},y:{min:60,max:145,ticks:{font:{size:9}},title:{display:true,text:'mmHg',font:{size:9}}}}}});
-  if(!charts.disp) charts.disp=new Chart(document.getElementById('ch-disp'),{type:'bar',data:{labels:dlabels,datasets:[{label:'Baseline',data:disp.map(x=>x.baseline),backgroundColor:'#B5D4F4',borderWidth:0},{label:'AI-assisted',data:disp.map(x=>x.ai),backgroundColor:'#1D9E75',borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},scales:{x:{ticks:{font:{size:9},autoSkip:false,maxRotation:25}},y:{ticks:{font:{size:9},callback:v=>v+'%'},title:{display:true,text:'Claim rate %',font:{size:9}}}}}});
+
+  if(!document.getElementById('local-community').hasChildNodes()){
+    document.getElementById('local-community').innerHTML=LOCAL_MEMBERS.map(m=>
+      `<div class="local-row">
+        <div class="local-av" style="background:${m.color}">${m.name.split(' ').map(w=>w[0]).join('')}</div>
+        <div style="flex:1"><p class="local-name">${m.name}</p><p class="local-meta">Week ${m.week} · ${m.city} · ${m.note}</p></div>
+        <button class="local-hi" onclick="sayHi(this)">Say hi 👋</button>
+      </div>`).join('');
+
+    document.getElementById('global-stats').innerHTML=
+      '<div class="gs"><div class="gs-v">12,400</div><div class="gs-l">Women active this week</div></div>'+
+      '<div class="gs"><div class="gs-v">14</div><div class="gs-l">Countries</div></div>'+
+      '<div class="gs"><div class="gs-v">2,841</div><div class="gs-l">At week 24 globally</div></div>';
+
+    document.getElementById('global-feed').innerHTML=GLOBAL_POSTS.map((p,i)=>
+      `<div class="feed-post">
+        <div class="feed-top">
+          <div class="feed-av" style="background:${p.color}">${p.anon[0]}</div>
+          <span class="feed-who">${p.anon}</span>
+          <span class="feed-when">${p.ago}</span>
+        </div>
+        <p class="feed-text">${p.text}</p>
+        <div class="feed-actions">
+          <button class="feed-act" onclick="likePost(this,${i})"><i class="ti ti-heart" style="font-size:12px"></i><span>${p.likes}</span></button>
+          <button class="feed-act" onclick="openModal('Replies','<p>Threaded replies are coming in the next release. For now, use the chat with Prof. Yogev for clinical questions.</p>')"><i class="ti ti-message-circle" style="font-size:12px"></i>${p.replies} replies</button>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function sayHi(btn){
+  btn.textContent='👋 Sent!'; btn.className='local-hi sent';
+}
+let likedPosts=new Set();
+function likePost(btn,i){
+  if(likedPosts.has(i)) return;
+  likedPosts.add(i);
+  btn.classList.add('liked');
+  const span=btn.querySelector('span');
+  span.textContent=parseInt(span.textContent)+1;
+}
+function toggleLocal(btn){
+  btn.style.display='none';
+  const extra=[
+    {name:'Dana L.',week:24,city:'Herzliya',color:'#D97706',note:'Due Sep 10'},
+    {name:'Michal B.',week:24,city:'Tel Aviv',color:'#DC2626',note:'Twins!'},
+  ];
+  extra.forEach(m=>{
+    const div=document.createElement('div');
+    div.className='local-row';
+    div.innerHTML=`<div class="local-av" style="background:${m.color}">${m.name.split(' ').map(w=>w[0]).join('')}</div><div style="flex:1"><p class="local-name">${m.name}</p><p class="local-meta">Week ${m.week} · ${m.city} · ${m.note}</p></div><button class="local-hi" onclick="sayHi(this)">Say hi 👋</button>`;
+    document.getElementById('local-community').appendChild(div);
+  });
 }
 
 let chatHistory=[];
