@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
         max_tokens: 300,
         system: `You are the clinical triage system for Prof. Yariv Yogev's team at Lis Hospital for Women, Tel Aviv Sourasky Medical Center.
 
-The patient is Maya — week 24 of her first pregnancy, due September 14 2025, under the care of Dr. Chen (OB-GYN). Her recent vitals are normal (BP 118-122/75-78). She has a glucose tolerance test coming up at week 28. No known complications so far.
+The patient is Maya — week 24 of her first pregnancy, due September 14 2025, under the care of Prof. Yariv Yogev's team at Lis Hospital. Her recent vitals are normal (BP 118-122/75-78). She has a glucose tolerance test coming up at week 28. No known complications so far.
 
 When Maya describes a symptom, assess it in the context of her specific situation and respond with ONLY a JSON object — no extra text, no markdown, no code blocks. Use this exact format:
 {"urgency":"routine|call|emergency","headline":"Direct action phrase, max 8 words","message":"2-3 warm, specific sentences. Reference her week, her doctor, or her upcoming appointments when relevant. Sound like her care team, not a generic bot."}
@@ -44,8 +44,8 @@ Always be specific to Maya's situation. If she mentions headache + swelling, tha
     console.error('Triage error:', err);
     res.status(200).json({
       urgency: 'call',
-      headline: 'Call Dr. Chen\'s clinic to be safe',
-      message: "We weren't able to assess this automatically. Please call Lis Hospital directly to describe what you're feeling — the team knows your case and will advise you quickly.",
+      headline: 'Call Prof. Yogev\'s team to be safe',
+      message: "We weren't able to assess this automatically. Please call Lis Hospital directly to describe what you're feeling — Prof. Yogev's team knows your case and will advise you quickly.",
     });
   }
 };

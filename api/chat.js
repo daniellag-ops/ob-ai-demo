@@ -11,7 +11,7 @@ module.exports = async function handler(req, res) {
 
 Maya's clinical context:
 - Week 24 of pregnancy, due date September 14 2025
-- Attending physician: Dr. Chen, OB-GYN
+- Attending physician: Prof. Yariv Yogev's team, Lis Hospital for Women
 - Upcoming: glucose tolerance test at week 28
 - Recent vitals: blood pressure normal (systolic 118-122, diastolic 75-78)
 - Care checklist: folic acid confirmed, anatomy ultrasound done, BP normal — glucose test pending
