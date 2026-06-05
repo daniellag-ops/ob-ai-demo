@@ -100,7 +100,22 @@ h1{font-size:18px;font-weight:500}
 .chat-qs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .chat-q{font-size:11px;padding:5px 11px;border-radius:20px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer}
 .chat-q:hover{background:var(--bg2)}
-@media(max-width:560px){.two{grid-template-columns:1fr!important}.chat-box{height:220px}.bubble{max-width:88%}}
+@media(max-width:560px){
+  .two{grid-template-columns:1fr!important}
+  .chat-box{height:220px}
+  .bubble{max-width:88%}
+  .db-hdr{flex-wrap:wrap;gap:8px}
+  .ins-t-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .ins-t{min-width:420px}
+  .ins-t th:nth-child(2),.ins-t td:nth-child(2),
+  .ins-t th:nth-child(5),.ins-t td:nth-child(5){display:none}
+  .roi-invest-grid{grid-template-columns:1fr!important}
+  .roi-bottom-grid{grid-template-columns:1fr 1fr!important}
+  .roi-big{font-size:20px!important}
+  .roi-flex{flex-direction:column!important;gap:8px!important}
+  .global-stats{grid-template-columns:1fr 1fr!important}
+  .aud-row{grid-template-columns:1fr!important}
+}
 @keyframes spin{to{transform:rotate(360deg)}}
 .leg{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:11px;color:var(--text2)}
 .leg span{display:flex;align-items:center;gap:4px}
@@ -310,10 +325,12 @@ body[data-view="p"] .db-sub{font-size:13px}
     </div>
     <div class="card">
       <p class="ct"><i class="ti ti-building-hospital" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Hospital performance — modelled at 4 coverage levels</p>
-      <table class="ins-t">
-        <thead><tr><th style="width:34%">Hospital</th><th style="width:12%">Deliveries</th><th style="width:13%">AI coverage</th><th style="width:12%">Claim rate</th><th style="width:13%">Trend</th><th style="width:16%">Status</th></tr></thead>
-        <tbody id="i-hosp-rows"></tbody>
-      </table>
+      <div class="ins-t-wrap">
+        <table class="ins-t">
+          <thead><tr><th style="width:34%">Hospital</th><th style="width:12%">Deliveries</th><th style="width:13%">AI coverage</th><th style="width:12%">Claim rate</th><th style="width:13%">Trend</th><th style="width:16%">Status</th></tr></thead>
+          <tbody id="i-hosp-rows"></tbody>
+        </table>
+      </div>
     </div>
     <div class="two">
       <div class="card" style="margin-bottom:0"><p class="ct">Top care gaps — simulation population</p><div style="position:relative;width:100%;height:190px"><canvas id="ch-ig" role="img" aria-label="Horizontal bar chart of top care gaps from simulation">Care gap frequencies from simulation data.</canvas></div></div>
@@ -705,7 +722,7 @@ function updateROI(){
   const payback=Math.round((investment/saved)*12);
   const fmt=v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'k':'$'+v;
   document.getElementById('roi-grid').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <div class="roi-invest-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
       <div class="roi-kpi" style="background:#FEF2F2;border:0.5px solid #FECACA">
         <div class="roi-kl" style="margin-bottom:4px">You invest (annual)</div>
         <div class="roi-kv" style="color:#991B1B">${fmt(investment)}</div>
@@ -717,17 +734,17 @@ function updateROI(){
         <div class="roi-kl">${claims.toLocaleString()} claims prevented</div>
       </div>
     </div>
-    <div style="background:var(--bg2);border-radius:var(--r);padding:.9rem 1rem;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div class="roi-flex" style="background:var(--bg2);border-radius:var(--r);padding:.9rem 1rem;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
       <div>
         <div style="font-size:11px;color:var(--text2);margin-bottom:3px">Net savings after platform cost</div>
-        <div style="font-size:26px;font-weight:700;color:#4F46E5">${fmt(net)}</div>
+        <div class="roi-big" style="font-size:26px;font-weight:700;color:#4F46E5">${fmt(net)}</div>
       </div>
       <div style="text-align:right">
         <div style="font-size:11px;color:var(--text2);margin-bottom:3px">Return on every $1 invested</div>
-        <div style="font-size:26px;font-weight:700;color:var(--teal)">${multiple}×</div>
+        <div class="roi-big" style="font-size:26px;font-weight:700;color:var(--teal)">${multiple}×</div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+    <div class="roi-bottom-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
       <div class="roi-kpi"><div class="roi-kv" style="font-size:18px">${payback} mo</div><div class="roi-kl">Payback period</div></div>
       <div class="roi-kpi"><div class="roi-kv" style="font-size:18px">${deaths}</div><div class="roi-kl">Deaths averted</div></div>
       <div class="roi-kpi"><div class="roi-kv" style="font-size:18px">${fmt(investment/12)}</div><div class="roi-kl">Monthly cost</div></div>
