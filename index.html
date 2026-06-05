@@ -3,752 +3,297 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prof. Daniel Seidman</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>OB & Maternity AI — Clinical Decision Support Demo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  :root {
-    --bg: #f0f4f4;
-    --surface: #ffffff;
-    --surface2: #e4eeee;
-    --accent: #0e6b6b;
-    --accent-soft: #d0e8e8;
-    --gold: #c9a84c;
-    --gold-soft: #f7edd8;
-    --text: #0d1f1f;
-    --text-mid: #3d5c5c;
-    --text-light: #7a9e9e;
-    --border: #cddede;
-    --radius: 16px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  body.rtl { direction: rtl; }
-  body.rtl .response-body ul { margin: 8px 20px 12px 0; }
-  body.rtl .disclaimer { border-left: none; border-right: 3px solid var(--gold); }
-  body.rtl .lang-toggle { margin-left: 0; margin-right: auto; }
-  body.rtl .doctor-badge { flex-direction: row-reverse; }
-
-  /* ── Header ── */
-  header {
-    padding: 0;
-    background: var(--accent);
-    display: flex;
-    flex-direction: column;
-  }
-
-  .header-top {
-    padding: 16px 28px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-
-  .avatar {
-    width: 42px; height: 42px;
-    border-radius: 50%;
-    background: var(--gold);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Serif Display', serif;
-    font-size: 17px;
-    color: white;
-    flex-shrink: 0;
-    letter-spacing: 0.5px;
-  }
-
-  .header-names { flex: 1; }
-
-  .doctor-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 18px;
-    color: white;
-    letter-spacing: -0.2px;
-    line-height: 1.2;
-  }
-
-  .doctor-title {
-    font-size: 11px;
-    color: rgba(255,255,255,0.55);
-    letter-spacing: 0.4px;
-    margin-top: 1px;
-  }
-
-  .lang-toggle {
-    margin-left: auto;
-    display: flex;
-    gap: 3px;
-    background: rgba(255,255,255,0.12);
-    border-radius: 100px;
-    padding: 4px;
-  }
-
-  .lang-btn {
-    padding: 5px 15px;
-    border-radius: 100px;
-    border: none;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    color: rgba(255,255,255,0.65);
-    background: transparent;
-  }
-
-  .lang-btn.active { background: var(--gold); color: var(--text); }
-
-  .header-tagline {
-    padding: 10px 28px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0.3px;
-  }
-
-  /* ── Main ── */
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    max-width: 780px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 32px 24px 100px;
-    gap: 22px;
-  }
-
-  /* ── Intro card ── */
-  .intro-card {
-    background: var(--accent);
-    border-radius: var(--radius);
-    padding: 28px 30px;
-    color: white;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .intro-card::after {
-    content: '';
-    position: absolute;
-    top: -30px; right: -30px;
-    width: 160px; height: 160px;
-    background: var(--gold);
-    opacity: 0.13;
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  body.rtl .intro-card::after { right: auto; left: -30px; }
-
-  .doctor-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255,255,255,0.12);
-    border-radius: 100px;
-    padding: 5px 14px 5px 8px;
-    margin-bottom: 14px;
-  }
-
-  .badge-dot {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: var(--gold);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Serif Display', serif;
-    font-size: 10px;
-    color: white;
-    flex-shrink: 0;
-  }
-
-  .badge-text {
-    font-size: 12px;
-    color: rgba(255,255,255,0.8);
-    letter-spacing: 0.2px;
-  }
-
-  .intro-card h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 25px;
-    line-height: 1.3;
-    margin-bottom: 10px;
-    font-weight: 400;
-    position: relative;
-  }
-
-  .intro-card p {
-    font-size: 14.5px;
-    opacity: 0.8;
-    line-height: 1.65;
-    max-width: 560px;
-    position: relative;
-  }
-
-  /* ── Section label ── */
-  .section-label {
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.9px;
-    color: var(--text-light);
-    display: block;
-    margin-bottom: 10px;
-  }
-
-  /* ── Phase pills ── */
-  .phase-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-
-  .phase-pill {
-    padding: 8px 16px;
-    border-radius: 100px;
-    border: 1.5px solid var(--border);
-    background: var(--surface);
-    font-size: 13px;
-    color: var(--text-mid);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    font-family: 'DM Sans', sans-serif;
-  }
-
-  .phase-pill:hover { border-color: var(--accent); color: var(--accent); }
-  .phase-pill.active { background: var(--accent); border-color: var(--accent); color: white; }
-
-  /* ── Input ── */
-  .input-card {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
-  .input-card:focus-within { border-color: var(--accent); }
-
-  .input-label {
-    padding: 16px 20px 0;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.9px;
-    color: var(--text-light);
-  }
-
-  textarea {
-    width: 100%;
-    border: none;
-    outline: none;
-    resize: none;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    color: var(--text);
-    background: transparent;
-    padding: 12px 20px 16px;
-    line-height: 1.6;
-    min-height: 100px;
-  }
-
-  textarea::placeholder { color: var(--text-light); }
-
-  .input-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    border-top: 1px solid var(--border);
-    background: var(--surface2);
-    gap: 12px;
-  }
-
-  .input-hint { font-size: 12px; color: var(--text-light); }
-
-  .send-btn {
-    background: var(--gold);
-    color: var(--text);
-    border: none;
-    border-radius: 100px;
-    padding: 10px 22px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .send-btn:hover { opacity: 0.85; }
-  .send-btn:active { transform: scale(0.97); }
-  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* ── Quick prompts ── */
-  .quick-prompts { display: flex; flex-wrap: wrap; gap: 8px; }
-
-  .quick-btn {
-    padding: 8px 14px;
-    border-radius: 10px;
-    border: 1.5px solid var(--border);
-    background: var(--surface);
-    font-size: 13px;
-    color: var(--text-mid);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    font-family: 'DM Sans', sans-serif;
-    text-align: start;
-    line-height: 1.4;
-  }
-
-  .quick-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-
-  /* ── Response ── */
-  .response-card {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    display: none;
-  }
-
-  .response-card.visible { display: block; }
-
-  .response-header {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--surface2);
-  }
-
-  .response-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; }
-
-  .response-title {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-mid);
-    text-transform: uppercase;
-    letter-spacing: 0.7px;
-  }
-
-  .response-body {
-    padding: 24px 28px;
-    font-size: 15px;
-    line-height: 1.75;
-    color: var(--text);
-  }
-
-  .response-body h3 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 19px;
-    font-weight: 400;
-    color: var(--accent);
-    margin: 22px 0 8px;
-  }
-
-  .response-body h3:first-child { margin-top: 0; }
-  .response-body p { margin-bottom: 12px; }
-  .response-body p:last-child { margin-bottom: 0; }
-  .response-body ul { margin: 8px 0 12px 20px; }
-  .response-body li { margin-bottom: 6px; }
-
-  .disclaimer {
-    margin-top: 20px;
-    padding: 14px 16px;
-    background: var(--gold-soft);
-    border-radius: 10px;
-    font-size: 13px;
-    color: var(--text-mid);
-    line-height: 1.55;
-    border-left: 3px solid var(--gold);
-  }
-
-  /* ── Loading ── */
-  .loading {
-    display: none;
-    padding: 32px 28px;
-    align-items: center;
-    gap: 14px;
-    color: var(--text-mid);
-    font-size: 14px;
-  }
-
-  .loading.visible { display: flex; }
-  .dots { display: flex; gap: 5px; }
-
-  .dot {
-    width: 7px; height: 7px;
-    background: var(--accent);
-    border-radius: 50%;
-    animation: bounce 1.2s infinite ease-in-out;
-    opacity: 0.6;
-  }
-
-  .dot:nth-child(2) { animation-delay: 0.2s; }
-  .dot:nth-child(3) { animation-delay: 0.4s; }
-
-  @keyframes bounce {
-    0%, 80%, 100% { transform: translateY(0); opacity: 0.6; }
-    40% { transform: translateY(-6px); opacity: 1; }
-  }
-
-  .error-msg { padding: 20px 28px; color: #b94b2b; font-size: 14px; display: none; }
-  .error-msg.visible { display: block; }
-
-  /* ── Footer note ── */
-  .footer-note {
-    text-align: center;
-    font-size: 12px;
-    color: var(--text-light);
-    padding: 0 20px 20px;
-    line-height: 1.6;
-  }
-
-  @media (max-width: 600px) {
-    main { padding: 20px 14px 80px; }
-    .intro-card { padding: 22px; }
-    .intro-card h1 { font-size: 21px; }
-    .header-top { padding: 14px 16px; }
-    .header-tagline { padding: 8px 16px; }
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f4f7f9;--bg3:#eef1f4;--text:#0f172a;--text2:#64748b;--text3:#94a3b8;--border:rgba(0,0,0,.10);--border2:rgba(0,0,0,.18);--teal:#0F6E56;--teal-bg:#E1F5EE;--teal-mid:#1D9E75;--blue:#185FA5;--blue-bg:#E6F1FB;--blue-mid:#378ADD;--amber:#854F0B;--amber-bg:#FAEEDA;--red:#A32D2D;--red-bg:#FCEBEB;--r:8px;--rl:12px}
+@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--bg2:#1e293b;--bg3:#0f172a;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18);--teal-bg:#04342C;--blue-bg:#042C53;--amber-bg:#412402;--red-bg:#501313}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh}
+.app{max-width:780px;margin:0 auto;padding:2rem 1rem}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.logo-dot{width:28px;height:28px;border-radius:8px;background:var(--teal-mid);display:flex;align-items:center;justify-content:center}
+.logo-dot i{color:#fff;font-size:15px}
+h1{font-size:18px;font-weight:500}
+.sub{font-size:12px;color:var(--text2);margin-top:2px;margin-bottom:1.5rem}
+.data-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 9px;border-radius:20px;background:var(--blue-bg);color:var(--blue);font-weight:500;margin-left:8px;vertical-align:middle}
+.tabs{display:flex;border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem}
+.tab{flex:1;padding:10px 6px;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--text2);cursor:pointer;border-right:0.5px solid var(--border)}
+.tab:last-child{border-right:none}
+.tab.on{background:var(--bg2);color:var(--text)}
+.tab i{display:block;font-size:18px;margin-bottom:3px}
+.db-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;gap:12px}
+.db-ttl{font-size:16px;font-weight:500}
+.db-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;white-space:nowrap}
+.pl{background:var(--teal-bg);color:var(--teal)}
+.pw{background:var(--amber-bg);color:var(--amber)}
+.pa{background:var(--red-bg);color:var(--red)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem}
+.kpi{background:var(--bg2);border-radius:var(--r);padding:.85rem 1rem}
+.kl{font-size:11px;color:var(--text2);margin-bottom:4px}
+.kv{font-size:20px;font-weight:500}
+.kv.t{color:var(--teal)}.kv.b{color:var(--blue)}.kv.r{color:var(--red)}
+.ks{font-size:11px;color:var(--text3);margin-top:2px}
+.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rl);padding:1rem 1.25rem;margin-bottom:1rem}
+.ct{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.75rem}
+.ar{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.ar:last-child{border-bottom:none}
+.ai{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.ir{background:var(--red-bg);color:var(--red)}.iw{background:var(--amber-bg);color:var(--amber)}.it{background:var(--teal-bg);color:var(--teal)}
+.ab{flex:1;min-width:0}
+.an{font-size:13px;font-weight:500;margin-bottom:2px}
+.ad{font-size:12px;color:var(--text2);margin-bottom:4px;line-height:1.5}
+.am{font-size:11px;color:var(--text3)}
+.btn{font-size:11px;padding:5px 11px;border-radius:6px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.btn:hover{background:var(--bg2)}.btn.p{background:var(--teal-bg);color:var(--teal);border-color:#9FE1CB}
+.pr{display:grid;grid-template-columns:1fr 48px 60px 60px 44px;gap:8px;align-items:center;font-size:12px;padding:8px 0;border-bottom:0.5px solid var(--border)}
+.pr:last-child{border-bottom:none}
+.pn{font-weight:500}.pd{font-size:11px;color:var(--text2)}
+.rp{display:inline-block;font-size:10px;padding:2px 7px;border-radius:12px;font-weight:500}
+.rph{background:var(--red-bg);color:var(--red)}.rpm{background:var(--amber-bg);color:var(--amber)}.rpl{background:var(--teal-bg);color:var(--teal)}
+.ins-t{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.ins-t th{text-align:left;padding:6px 8px;font-weight:500;font-size:11px;color:var(--text2);border-bottom:0.5px solid var(--border);text-transform:uppercase;letter-spacing:.04em}
+.ins-t td{padding:8px;border-bottom:0.5px solid var(--border);vertical-align:middle}
+.ins-t tr:last-child td{border-bottom:none}
+.spark{display:inline-flex;gap:2px;align-items:flex-end;height:18px}
+.spark span{width:4px;border-radius:1px;background:var(--blue-mid);display:inline-block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:520px){.two{grid-template-columns:1fr}}
+.tl{display:flex;margin-bottom:1.25rem}
+.ts{flex:1;text-align:center;position:relative}
+.ts::before{content:'';position:absolute;top:14px;left:50%;right:-50%;height:2px;background:var(--border);z-index:0}
+.ts:last-child::before{display:none}
+.td{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:13px;position:relative;z-index:1}
+.td.d{background:var(--teal-bg);color:var(--teal);border:2px solid var(--teal-mid)}
+.td.n{background:var(--blue-bg);color:var(--blue);border:2px solid var(--blue-mid)}
+.td.u{background:var(--bg2);color:var(--text3);border:1px solid var(--border)}
+.tll{font-size:11px;color:var(--text2)}.tlw{font-size:10px;color:var(--text3)}
+.cr{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.cr:last-child{border-bottom:none}.cl{flex:1}.cd{font-size:11px;color:var(--text3)}
+.cw{background:var(--amber-bg);margin:0 -1.25rem;padding:8px 1.25rem}
+.aib{background:var(--bg2);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:.75rem;font-size:13px;line-height:1.6}
+.qb{display:flex;gap:8px;flex-wrap:wrap}
+.leg{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:11px;color:var(--text2)}
+.leg span{display:flex;align-items:center;gap:4px}
+.lsq{width:10px;height:10px;border-radius:2px;display:inline-block}
+.clbl{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px}
+.src{font-size:10px;color:var(--text3);margin-top:.5rem;font-style:italic}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="header-top">
-    <div class="avatar">DS</div>
-    <div class="header-names">
-      <div class="doctor-name" id="doctorName">Prof. Daniel Seidman</div>
-      <div class="doctor-title" id="doctorTitle">Reproductive Endocrinology & Infertility</div>
-    </div>
-    <div class="lang-toggle">
-      <button class="lang-btn active" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" onclick="setLang('he')">עב</button>
-    </div>
-  </div>
-  <div class="header-tagline" id="headerTagline">A personal guide to understanding your fertility journey</div>
-</header>
-
-<main>
-
-  <div class="intro-card">
-    <div class="doctor-badge">
-      <div class="badge-dot">DS</div>
-      <span class="badge-text" id="badgeText">Prof. Seidman's Patient Resource</span>
-    </div>
-    <h1 id="introTitle">What did we discuss at your appointment today?</h1>
-    <p id="introDesc">Enter your results or questions here — hormone levels, follicle counts, embryo updates — and receive a clear, expert explanation of what they mean and what comes next.</p>
-  </div>
-
-  <div>
-    <span class="section-label" id="phaseLabel">Your current phase</span>
-    <div class="phase-pills" id="phasePills"></div>
-  </div>
-
-  <div class="input-card">
-    <div class="input-label" id="inputLabel">Your results or question</div>
-    <textarea id="userInput" rows="4"></textarea>
-    <div class="input-footer">
-      <span class="input-hint" id="inputHint">Private & confidential — nothing is stored.</span>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-        <span id="sendBtnText">Explain this</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
+<div class="app">
+  <div class="logo-row">
+    <div class="logo-dot"><i class="ti ti-heart-rate-monitor"></i></div>
+    <div>
+      <h1>OB & Maternity AI <span class="data-badge"><i class="ti ti-database" style="font-size:11px"></i>Live simulation data</span></h1>
+      <p class="sub">Daniella Gilboa · Synthea + HCUP NIS 2021 + CDC 2021 · 10,000 simulated deliveries</p>
     </div>
   </div>
 
-  <div>
-    <div class="section-label" id="quickLabel">Frequently asked questions</div>
-    <div class="quick-prompts" id="quickPrompts"></div>
+  <div class="tabs">
+    <button class="tab on" onclick="show('h')" id="t-h"><i class="ti ti-building-hospital"></i>Hospital</button>
+    <button class="tab" onclick="show('i')" id="t-i"><i class="ti ti-shield-check"></i>Insurer</button>
+    <button class="tab" onclick="show('p')" id="t-p"><i class="ti ti-heart"></i>Patient</button>
   </div>
 
-  <div class="response-card" id="responseCard">
-    <div class="response-header">
-      <div class="response-dot"></div>
-      <span class="response-title" id="responseTitle">Clinical explanation</span>
+  <div id="v-h">
+    <div class="db-hdr"><div><p class="db-ttl">Clinical decision support — OB unit</p><p class="db-sub">Mount Sinai Medical Center · Labor & Delivery · Live</p></div><span class="pill pl"><i class="ti ti-radio" style="font-size:11px"></i> <span id="h-active"></span> active patients</span></div>
+    <div class="kpis">
+      <div class="kpi"><p class="kl">AI flags today</p><p class="kv b" id="h-flags"></p><p class="ks" id="h-acted"></p></div>
+      <div class="kpi"><p class="kl">Claims prevented MTD</p><p class="kv t" id="h-claims"></p><p class="ks" id="h-saved"></p></div>
+      <div class="kpi"><p class="kl">Guideline adherence</p><p class="kv t" id="h-adh"></p><p class="ks" id="h-adh-sub"></p></div>
+      <div class="kpi"><p class="kl">Unresolved alerts</p><p class="kv r" id="h-unres"></p><p class="ks">needs action</p></div>
     </div>
-    <div class="loading" id="loadingIndicator">
-      <div class="dots">
-        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="card">
+      <p class="ct"><i class="ti ti-bell" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Active AI alerts — real gaps from simulation</p>
+      <div id="h-alerts"></div>
+    </div>
+    <div class="card">
+      <p class="ct"><i class="ti ti-users" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Active patient list</p>
+      <div class="pr" style="color:var(--text2);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding-bottom:6px"><span>Patient</span><span>GA</span><span>Risk</span><span>Flags</span><span></span></div>
+      <div id="h-patients"></div>
+    </div>
+    <p class="clbl">Monthly claims — baseline vs AI-assisted</p>
+    <div style="position:relative;width:100%;height:200px"><canvas id="ch-h" role="img" aria-label="Bar chart of monthly OB claims baseline vs AI-assisted">Monthly claim trends from simulation.</canvas></div>
+    <div class="leg"><span><span class="lsq" style="background:#B5D4F4"></span>Baseline</span><span><span class="lsq" style="background:#1D9E75"></span>AI-assisted</span></div>
+    <p class="src">Source: Synthea synthetic population · HCUP NIS 2021 benchmark rates</p>
+  </div>
+
+  <div id="v-i" style="display:none">
+    <div class="db-hdr"><div><p class="db-ttl">OB network performance — portfolio view</p><p class="db-sub">Network · Simulation cohort · 10,000 deliveries</p></div><span class="pill pl"><i class="ti ti-refresh" style="font-size:11px"></i> Simulation data</span></div>
+    <div class="kpis">
+      <div class="kpi"><p class="kl">Network deliveries</p><p class="kv" id="i-del"></p><p class="ks">simulated cohort</p></div>
+      <div class="kpi"><p class="kl">Claims cost saved</p><p class="kv t" id="i-saved"></p><p class="ks">vs no-AI baseline</p></div>
+      <div class="kpi"><p class="kl">Claims prevented</p><p class="kv b" id="i-claims"></p><p class="ks" id="i-pct"></p></div>
+      <div class="kpi"><p class="kl">AI claim rate</p><p class="kv t" id="i-rate"></p><p class="ks" id="i-rate-sub"></p></div>
+    </div>
+    <div class="card">
+      <p class="ct"><i class="ti ti-building-hospital" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Hospital performance — modelled at 4 coverage levels</p>
+      <table class="ins-t">
+        <thead><tr><th style="width:34%">Hospital</th><th style="width:12%">Deliveries</th><th style="width:13%">AI coverage</th><th style="width:12%">Claim rate</th><th style="width:13%">Trend</th><th style="width:16%">Status</th></tr></thead>
+        <tbody id="i-hosp-rows"></tbody>
+      </table>
+    </div>
+    <div class="two">
+      <div class="card" style="margin-bottom:0"><p class="ct">Top care gaps — simulation population</p><div style="position:relative;width:100%;height:190px"><canvas id="ch-ig" role="img" aria-label="Horizontal bar chart of top care gaps from simulation">Care gap frequencies from simulation data.</canvas></div></div>
+      <div class="card" style="margin-bottom:0"><p class="ct">Savings by claim type</p><div style="position:relative;width:100%;height:190px"><canvas id="ch-is" role="img" aria-label="Bar chart of cost savings by claim type from simulation">Cost savings by claim type.</canvas></div></div>
+    </div>
+    <p class="src" style="margin-top:.75rem">Source: simulation.py · patients_baseline.csv / patients_ai.csv · HCUP NIS calibrated rates</p>
+  </div>
+
+  <div id="v-p" style="display:none">
+    <div class="db-hdr"><div><p class="db-ttl">Your pregnancy — week 24</p><p class="db-sub">Hello, Maya · Due date: Sep 14, 2025 · Dr. Chen, OB-GYN</p></div><span class="pill pw"><i class="ti ti-alert-circle" style="font-size:11px"></i> 1 action needed</span></div>
+    <div class="card">
+      <p class="ct"><i class="ti ti-timeline" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Pregnancy timeline</p>
+      <div class="tl">
+        <div class="ts"><div class="td d"><i class="ti ti-check" style="font-size:12px"></i></div><div class="tll">1st trimester</div><div class="tlw">Wk 1–12</div></div>
+        <div class="ts"><div class="td d"><i class="ti ti-check" style="font-size:12px"></i></div><div class="tll">Anatomy scan</div><div class="tlw">Wk 20</div></div>
+        <div class="ts"><div class="td n"><i class="ti ti-map-pin" style="font-size:12px"></i></div><div class="tll" style="color:var(--text);font-weight:500">You are here</div><div class="tlw">Wk 24</div></div>
+        <div class="ts"><div class="td u"><i class="ti ti-test-pipe" style="font-size:12px"></i></div><div class="tll">Glucose test</div><div class="tlw">Wk 28</div></div>
+        <div class="ts"><div class="td u"><i class="ti ti-dna" style="font-size:12px"></i></div><div class="tll">GBS screen</div><div class="tlw">Wk 36</div></div>
+        <div class="ts"><div class="td u"><i class="ti ti-heart" style="font-size:12px"></i></div><div class="tll">Due date</div><div class="tlw">Sep 14</div></div>
       </div>
-      <span id="loadingText">Preparing your explanation…</span>
     </div>
-    <div class="error-msg" id="errorMsg"></div>
-    <div class="response-body" id="responseBody"></div>
+    <div class="two">
+      <div class="card" style="margin-bottom:0">
+        <p class="ct"><i class="ti ti-circle-check" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Your care checklist</p>
+        <div class="cr"><i class="ti ti-circle-check" style="color:var(--teal);font-size:16px"></i><span class="cl">Folic acid (400mcg daily)</span><span class="cd">Confirmed</span></div>
+        <div class="cr"><i class="ti ti-circle-check" style="color:var(--teal);font-size:16px"></i><span class="cl">Anatomy ultrasound</span><span class="cd">Mar 3</span></div>
+        <div class="cr"><i class="ti ti-circle-check" style="color:var(--teal);font-size:16px"></i><span class="cl">Blood pressure check</span><span class="cd">Normal</span></div>
+        <div class="cr cw"><i class="ti ti-alert-circle" style="color:var(--amber);font-size:16px"></i><span class="cl" style="font-weight:500">Glucose tolerance test</span><span class="cd" style="color:var(--amber)">Due wk 28</span></div>
+        <div class="cr"><i class="ti ti-circle" style="color:var(--text3);font-size:16px"></i><span class="cl" style="color:var(--text2)">GBS screening</span><span class="cd">Wk 36</span></div>
+        <div class="cr"><i class="ti ti-circle" style="color:var(--text3);font-size:16px"></i><span class="cl" style="color:var(--text2)">Birth plan discussion</span><span class="cd">Wk 32</span></div>
+        <p class="src" style="margin-top:.75rem">GDM screen flagged in <span id="p-gdm-pct"></span>% of similar patients in our simulation</p>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <p class="ct"><i class="ti ti-activity" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Your vitals trend</p>
+        <div style="position:relative;width:100%;height:155px"><canvas id="ch-bp" role="img" aria-label="Line chart of blood pressure over prenatal visits">BP readings across prenatal visits.</canvas></div>
+        <div class="leg"><span><span class="lsq" style="background:#378ADD"></span>Systolic</span><span><span class="lsq" style="background:#1D9E75"></span>Diastolic</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <p class="ct"><i class="ti ti-message-circle" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>AI health assistant</p>
+      <div class="aib"><span style="font-weight:500;color:var(--blue)">Reminder:</span> Your glucose tolerance test is coming up at week 28. In our simulation, <span id="p-gdm-msg"></span>% of patients like you had unscreened GDM — this test catches it early. No fasting needed beforehand.</div>
+      <div class="qb"><button class="btn p">What to expect</button><button class="btn">Warning signs to watch</button><button class="btn">Nutrition advice</button></div>
+    </div>
+    <div class="card">
+      <p class="ct"><i class="ti ti-chart-bar" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Population context — how patients like you did</p>
+      <div style="position:relative;width:100%;height:180px"><canvas id="ch-disp" role="img" aria-label="Bar chart showing claim rates by race ethnicity baseline vs AI-assisted from simulation">Claim rates by race and ethnicity from simulation data.</canvas></div>
+      <div class="leg"><span><span class="lsq" style="background:#B5D4F4"></span>Baseline</span><span><span class="lsq" style="background:#1D9E75"></span>AI-assisted</span></div>
+      <p class="src">Disparity data from simulation · 10,000 patients · HCUP NIS / CDC 2021 calibration</p>
+    </div>
   </div>
-
-  <div class="footer-note" id="footerNote">
-    This resource was created by Prof. Daniel Seidman to help his patients better understand their fertility journey.
-  </div>
-
-</main>
+</div>
 
 <script>
-let currentLang = 'en';
-let selectedPhase = '';
+const D = ;
 
-const content = {
-  en: {
-    doctorName: 'Prof. Daniel Seidman',
-    doctorTitle: 'Reproductive Endocrinology & Infertility',
-    headerTagline: 'A personal guide to understanding your fertility journey',
-    badgeText: "From the practice of Prof. Seidman",
-    introTitle: 'What did we discuss at your appointment today?',
-    introDesc: 'Enter your results or questions here — hormone levels, follicle counts, embryo updates — and receive a clear, expert explanation of what they mean and what comes next.',
-    phaseLabel: 'Your current phase',
-    inputLabel: 'Your results or question',
-    inputPlaceholder: "e.g. Day 6 of stims. Estradiol: 1,240 pg/mL. Ultrasound showed 5 follicles at 16mm, 3 at 14mm, 2 at 12mm. What does this mean?",
-    inputHint: 'Private & confidential — nothing is stored.',
-    sendBtn: 'Explain this',
-    quickLabel: 'Frequently asked questions',
-    responseTitle: 'Clinical explanation',
-    loadingText: 'Preparing your explanation…',
-    errorText: 'Something went wrong. Please try again.',
-    footerNote: 'This resource was created by Prof. Daniel Seidman to help his patients better understand their fertility journey.',
-    phases: [
-      { label: '💉 IVF Stimulation', value: 'IVF stimulation', sample: 'Day 6 of stims. Estradiol: 1,240 pg/mL. Ultrasound: 5 follicles at 16mm, 3 at 14mm, 2 at 12mm. Is my response on track?' },
-      { label: '🥚 Retrieval & Recovery', value: 'egg retrieval and recovery', sample: 'They retrieved 9 eggs, 7 were mature. I\'m feeling bloated and crampy. Is this normal, and what happens to my eggs now?' },
-      { label: '🔬 Embryo Development', value: 'embryo development in the lab', sample: 'Day 5 report: 2 blastocysts graded 4AA and 3BB, 1 still developing. What do these grades mean and should I wait for day 6?' },
-      { label: '🌱 FET Prep', value: 'frozen embryo transfer preparation', sample: 'Day 10 of estrogen priming. Lining is 7.4mm, trilaminar pattern. When will I be ready for transfer?' },
-      { label: '❄️ Fertility Preservation', value: 'fertility preservation (egg or embryo freezing)', sample: 'I\'m 34, AMH is 1.8, AFC is 11. How many eggs should I aim to freeze and how many cycles might I need?' },
-      { label: '💙 After a Difficult Cycle', value: 'processing a failed or difficult cycle', sample: 'Our transfer didn\'t work. We have one frozen embryo left. I don\'t know what questions to ask at our next appointment.' },
-    ],
-    quickPrompts: [
-      'What does AMH of 1.1 ng/mL mean for my IVF chances?',
-      'My embryo was graded 3BB — is that good?',
-      'Day 8 stims: E2 is 3,400, trigger tonight. Why so fast?',
-      'We got 10 eggs but only 2 blastocysts. What happened?',
-      'PGT-A showed 1 euploid out of 4 embryos. Is that normal?',
-      'My lining is 7.2mm on day 10 of FET prep. Is it thick enough?',
-    ],
-    systemPrompt: (phase) => `You are a clinical patient education tool created by Prof. Daniel Seidman, one of Israel's most respected reproductive endocrinologists and IVF specialists. You help his patients understand their fertility results and treatment journey.
+function fmt_cost(v){return v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+Math.round(v/1e3)+'k':'$'+Math.round(v)}
+function fmt_num(v){return Math.round(v).toLocaleString()}
 
-Your role:
-1. Explain results clearly and accurately, as Prof. Seidman's practice would — warm but precise
-2. Put results in the context of where the patient is in their cycle
-3. Explain what to expect next, practically and honestly
-4. End with 1-2 specific questions the patient might bring to their next appointment with Prof. Seidman
+let charts={};
 
-Tone: balanced — warm and reassuring, but clinically grounded. These are Prof. Seidman's patients; they expect expertise. Never alarmist. Acknowledge difficulty when relevant. Be specific — avoid vague reassurances.
+function render_hospital(){
+  const h=D.hospital, k=h.kpis;
+  document.getElementById('h-active').textContent = k.active_patients;
+  document.getElementById('h-flags').textContent  = fmt_num(k.flags_today);
+  document.getElementById('h-acted').textContent  = fmt_num(k.flags_acted_today)+' acted on';
+  document.getElementById('h-claims').textContent = fmt_num(k.claims_prevented_mtd);
+  document.getElementById('h-saved').textContent  = fmt_cost(k.cost_saved_mtd)+' saved';
+  document.getElementById('h-adh').textContent    = k.guideline_adherence+'%';
+  document.getElementById('h-adh-sub').textContent= '↑ from '+k.adherence_baseline+'% baseline';
+  document.getElementById('h-unres').textContent  = k.unresolved_alerts;
 
-Use markdown headers (###) to structure your response into clear sections. Max 4-5 sections. Always end with a "Questions to ask Prof. Seidman:" section.
+  const ICONS={'critical':'alert-triangle','moderate':'droplet','resolved':'check'};
+  const COLORS={'critical':'r','moderate':'w','resolved':'t'};
+  const alert_html = h.alerts.map((a,idx)=>{
+    const g=a.gaps[0];
+    const sev=g.severity;
+    const cls=COLORS[sev]||'w';
+    const ic=g.icon||ICONS[sev];
+    return `<div class="ar">
+      <div class="ai i${cls}"><i class="ti ti-${ic}"></i></div>
+      <div class="ab">
+        <p class="an">Patient ${idx+1} · Age ${a.age} · ${a.insurance}</p>
+        <p class="ad">${g.desc}</p>
+        <p class="am">${g.type} · ${sev.charAt(0).toUpperCase()+sev.slice(1)}</p>
+      </div>
+      ${sev==='critical'?'<button class="btn p">View protocol</button>':'<button class="btn">Guidelines</button>'}
+    </div>`;
+  }).join('');
+  document.getElementById('h-alerts').innerHTML = alert_html||'<p style="font-size:13px;color:var(--text2);padding:8px 0">No critical alerts at this time.</p>';
 
-End with a brief note that this explanation was prepared by Prof. Seidman's practice to help patients understand their journey. Respond in English.
+  const RISK=['High','High','Medium','Low'];
+  const FLAGS=['2 open','1 open','1 open','Clear'];
+  const FCOL=['var(--red)','var(--red)','var(--amber)','var(--teal)'];
+  const RPCL=['rph','rph','rpm','rpl'];
+  const GAs=['28w','36w','22w','30w'];
+  document.getElementById('h-patients').innerHTML = h.alerts.slice(0,4).map((a,i)=>`
+    <div class="pr">
+      <div><p class="pn">Patient ${i+1}</p><p class="pd">Age ${a.age} · ${a.insurance}</p></div>
+      <span style="color:var(--text2)">${GAs[i]||'30w'}</span>
+      <span><span class="rp ${RPCL[i]}">${RISK[i]}</span></span>
+      <span style="color:${FCOL[i]};font-weight:500">${FLAGS[i]}</span>
+      <button class="btn" style="font-size:10px;padding:3px 7px">View</button>
+    </div>`).join('');
 
-Patient's current treatment phase: ${phase}`
-  },
-  he: {
-    doctorName: 'פרופ׳ דניאל זיידמן',
-    doctorTitle: 'רפואת פוריות ואנדוקרינולוגיה',
-    headerTagline: 'מדריך אישי להבנת מחזור טיפול IVF',
-    badgeText: 'מהמרפאה של פרופ׳ זיידמן',
-    introTitle: 'מה דיברנו בביקור שלך היום?',
-    introDesc: 'הכניסי כאן את התוצאות שלך או שאלות — רמות הורמונים, ספירת זקיקים, עדכוני עוברים — וקבלי הסבר מקצועי וברור על מה שהן אומרות ומה הצעד הבא.',
-    phaseLabel: 'השלב הנוכחי שלך',
-    inputLabel: 'התוצאות שלך או שאלה',
-    inputPlaceholder: 'לדוגמה: יום 6 של גירוי. אסטרדיול: 1,240. אולטרסאונד הראה 5 זקיקים של 16 מ"מ, 3 של 14 מ"מ, 2 של 12 מ"מ. מה זה אומר?',
-    inputHint: 'פרטי וחסוי — שום דבר לא נשמר.',
-    sendBtn: 'הסבירי לי',
-    quickLabel: 'שאלות נפוצות',
-    responseTitle: 'הסבר קליני',
-    loadingText: 'מכינה את ההסבר שלך…',
-    errorText: 'משהו השתבש. אנא נסי שוב.',
-    footerNote: 'פרופ׳ דניאל זיידמן',
-    phases: [
-      { label: '💉 גירוי הורמונלי (IVF)', value: 'גירוי הורמונלי לטיפול IVF', sample: 'יום 6 של גירוי. אסטרדיול: 1,240. אולטרסאונד: 5 זקיקים של 16 מ"מ, 3 של 14 מ"מ, 2 של 12 מ"מ. האם התגובה שלי תקינה?' },
-      { label: '🥚 שאיבה והתאוששות', value: 'שאיבת ביציות והתאוששות', sample: 'שאבו 9 ביציות, 7 היו בשלות. אני מרגישה נפיחות וכאבים. האם זה תקין ומה קורה לביציות עכשיו?' },
-      { label: '🔬 התפתחות עוברים', value: 'התפתחות עוברים במעבדה', sample: 'דיווח יום 5: 2 בלסטוציסטים בדרגה 4AA ו-3BB, אחד עדיין מתפתח. מה אומרות הדרגות האלה?' },
-      { label: '🌱 הכנה ל-FET', value: 'הכנה להחזרת עובר קפוא (FET)', sample: 'יום 10 לאסטרוגן. רירית 7.4 מ"מ, תבנית שלוש שכבות. מתי אהיה מוכנה להחזרה?' },
-      { label: '❄️ שימור פוריות', value: 'שימור פוריות (הקפאת ביציות או עוברים)', sample: 'אני בת 34, AMH 1.8, AFC 11. כמה ביציות כדאי לי לשמר וכמה מחזורים אצטרך?' },
-      { label: '💙 אחרי מחזור קשה', value: 'עיבוד מחזור שנכשל או היה קשה', sample: 'ההחזרה לא הצליחה. נשאר לנו עובר קפוא אחד. אני לא יודעת אילו שאלות לשאול בפגישה הבאה.' },
-    ],
-    quickPrompts: [
-      'מה אומרת רמת AMH של 1.1 על הסיכויים שלי ב-IVF?',
-      'העובר שלי קיבל ציון 3BB — האם זה טוב?',
-      'יום 8 של גירוי: E2 הוא 3,400, טריגר הלילה. למה כל כך מהר?',
-      'שאבו 10 ביציות אבל רק 2 הגיעו לבלסטוציסט. מה קרה?',
-      'PGT-A הראה 1 נורמלי מתוך 4 עוברים. האם זה רגיל?',
-      'רירית הרחם שלי 7.2 מ"מ ביום 10 של הכנה ל-FET. האם מספיק עבה?',
-    ],
-    systemPrompt: (phase) => `את כלי חינוך קליני למטופלות שנוצר על ידי פרופ׳ דניאל זיידמן, אחד ממומחי הפוריות המובילים בישראל. את עוזרת למטופלותיו להבין את תוצאות הפוריות שלהן ואת מסע הטיפול.
-
-תפקידך:
-1. להסביר תוצאות בצורה ברורה ומדויקת, בסגנון של מרפאת פרופ׳ זיידמן — חמה אך מדויקת
-2. להציב את התוצאות בהקשר של שלב הטיפול
-3. להסביר מה צפוי להיות הצעד הבא, בצורה מעשית וכנה
-4. לסיים עם 1-2 שאלות ספציפיות שהמטופלת יכולה להביא לפגישה הבאה עם פרופ׳ זיידמן
-
-טון: מאוזן — חמה ומרגיעה, אבל מבוססת קלינית. אלה מטופלות של פרופ׳ זיידמן; הן מצפות למומחיות. לא מדאיגה. הכירי בקושי כשרלוונטי. היי ספציפית — הימנעי מהרגעה מעורפלת.
-
-השתמשי בכותרות markdown (###) לארגון התשובה לחלקים ברורים. עד 4-5 חלקים. תמיד סיימי עם חלק "שאלות לפרופ׳ זיידמן:".
-
-סיימי עם הערה קצרה שהסבר זה הוכן על ידי מרפאת פרופ׳ זיידמן כדי לסייע למטופלות להבין את מסעם. השיבי בעברית.
-
-שלב הטיפול הנוכחי של המטופלת: ${phase}`
-  }
-};
-
-function setLang(lang) {
-  currentLang = lang;
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  document.body.classList.toggle('rtl', lang === 'he');
-  document.documentElement.lang = lang;
-  document.getElementById('responseCard').classList.remove('visible');
-  renderUI();
+  const m=h.monthly_trend;
+  if(!charts.h) charts.h=new Chart(document.getElementById('ch-h'),{type:'bar',data:{labels:m.map(x=>x.month),datasets:[{label:'Baseline',data:m.map(x=>x.baseline),backgroundColor:'#B5D4F4',borderWidth:0},{label:'AI-assisted',data:m.map(x=>x.ai),backgroundColor:'#1D9E75',borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:10}},title:{display:true,text:'Claims',font:{size:10}}}}}});
 }
 
-function renderUI() {
-  const c = content[currentLang];
-  document.getElementById('doctorName').textContent = c.doctorName;
-  document.getElementById('doctorTitle').textContent = c.doctorTitle;
-  document.getElementById('headerTagline').textContent = c.headerTagline;
-  document.getElementById('badgeText').textContent = c.badgeText;
-  document.getElementById('introTitle').textContent = c.introTitle;
-  document.getElementById('introDesc').textContent = c.introDesc;
-  document.getElementById('phaseLabel').textContent = c.phaseLabel;
-  document.getElementById('inputLabel').textContent = c.inputLabel;
-  document.getElementById('userInput').placeholder = c.inputPlaceholder;
-  document.getElementById('inputHint').textContent = c.inputHint;
-  document.getElementById('sendBtnText').textContent = c.sendBtn;
-  document.getElementById('quickLabel').textContent = c.quickLabel;
-  document.getElementById('responseTitle').textContent = c.responseTitle;
-  document.getElementById('loadingText').textContent = c.loadingText;
-  document.getElementById('footerNote').textContent = c.footerNote;
+function render_insurer(){
+  const ins=D.insurer, m=D.meta;
+  document.getElementById('i-del').textContent   = fmt_num(ins.kpis.network_deliveries);
+  document.getElementById('i-saved').textContent = fmt_cost(ins.kpis.cost_saved);
+  document.getElementById('i-claims').textContent= fmt_num(m.claims_prevented);
+  document.getElementById('i-pct').textContent   = m.claim_rate_reduction_pct+'% reduction';
+  document.getElementById('i-rate').textContent  = m.ai_claim_rate+'%';
+  document.getElementById('i-rate-sub').textContent = '↓ from '+m.baseline_claim_rate+'% baseline';
 
-  const pillsContainer = document.getElementById('phasePills');
-  pillsContainer.innerHTML = '';
-  c.phases.forEach((phase, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'phase-pill' + (i === 0 ? ' active' : '');
-    btn.textContent = phase.label;
-    btn.dataset.value = phase.value;
-    btn.onclick = () => {
-      document.querySelectorAll('.phase-pill').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      selectedPhase = phase.value;
-      if (phase.sample) {
-        document.getElementById('userInput').value = phase.sample;
-      }
-    };
-    pillsContainer.appendChild(btn);
+  const STATUS_CLS={'Top performer':'pl','On track':'pl','Below target':'pw','Action needed':'pa'};
+  const TRENDS={'Top performer':[10,8,7,5,4],'On track':[12,9,8,6,5],'Below target':[10,11,12,10,11],'Action needed':[9,11,13,14,15]};
+  document.getElementById('i-hosp-rows').innerHTML = ins.hospitals.map(h=>{
+    const t=TRENDS[h.status]||[10,10,10,10,10];
+    const spark=t.map(v=>`<span style="height:${v}px"></span>`).join('');
+    const cr_col=h.claim_rate>8?'var(--red)':h.claim_rate>7?'var(--amber)':'var(--teal)';
+    const ai_col=h.ai_pct>75?'var(--teal)':h.ai_pct>60?'var(--amber)':'var(--red)';
+    return `<tr><td><span style="font-weight:500">${h.name}</span></td><td>${fmt_num(h.deliveries)}</td><td style="color:${ai_col}">${h.ai_pct}%</td><td style="color:${cr_col}">${h.claim_rate}%</td><td><div class="spark">${spark}</div></td><td><span class="pill ${STATUS_CLS[h.status]||'pl'}">${h.status}</span></td></tr>`;
+  }).join('');
+
+  const gaps=ins.gap_counts;
+  const glabels=Object.keys(gaps).slice(0,5);
+  const gvals=glabels.map(k=>gaps[k]);
+  if(!charts.ig) charts.ig=new Chart(document.getElementById('ch-ig'),{type:'bar',data:{labels:glabels,datasets:[{data:gvals,backgroundColor:'#85B7EB',borderWidth:0}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.x.toLocaleString()+' patients'}}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:10}}}}}});
+
+  const sv=ins.savings_by_type.slice(0,6);
+  if(!charts.is) charts.is=new Chart(document.getElementById('ch-is'),{type:'bar',data:{labels:sv.map(x=>x.label),datasets:[{data:sv.map(x=>x.saved_m),backgroundColor:'#1D9E75',borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.parsed.y.toFixed(2)+'M'}}},scales:{x:{ticks:{font:{size:9}},grid:{display:false}},y:{ticks:{font:{size:9},callback:v=>'$'+v+'M'}}}}});
+}
+
+function render_patient(){
+  const m=D.meta;
+  const gdm_gap=D.insurer.gap_counts['GDM screen']||0;
+  const gdm_pct=Math.round(gdm_gap/m.population*100);
+  document.getElementById('p-gdm-pct').textContent=gdm_pct;
+  document.getElementById('p-gdm-msg').textContent=gdm_pct;
+
+  const disp=D.disparity;
+  const dlabels=disp.map(x=>x.group.replace(' non-Hispanic','').replace('Hispanic','Hispanic'));
+  if(!charts.bp) charts.bp=new Chart(document.getElementById('ch-bp'),{type:'line',data:{labels:['Wk 8','Wk 12','Wk 16','Wk 20','Wk 24'],datasets:[{label:'Systolic',data:[118,120,116,119,122],borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.06)',fill:true,tension:0.35,pointRadius:4,borderWidth:2,borderDash:[]},{label:'Diastolic',data:[75,78,74,76,78],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.04)',fill:true,tension:0.35,pointRadius:4,borderWidth:2,borderDash:[4,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9}},grid:{display:false}},y:{min:60,max:145,ticks:{font:{size:9}},title:{display:true,text:'mmHg',font:{size:9}}}}}});
+  if(!charts.disp) charts.disp=new Chart(document.getElementById('ch-disp'),{type:'bar',data:{labels:dlabels,datasets:[{label:'Baseline',data:disp.map(x=>x.baseline),backgroundColor:'#B5D4F4',borderWidth:0},{label:'AI-assisted',data:disp.map(x=>x.ai),backgroundColor:'#1D9E75',borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toFixed(1)+'%'}}},scales:{x:{ticks:{font:{size:9},autoSkip:false,maxRotation:25}},y:{ticks:{font:{size:9},callback:v=>v+'%'},title:{display:true,text:'Claim rate %',font:{size:9}}}}}});
+}
+
+function show(v){
+  ['h','i','p'].forEach(id=>{
+    document.getElementById('v-'+id).style.display=id===v?'block':'none';
+    document.getElementById('t-'+id).className='tab'+(id===v?' on':'');
   });
-  selectedPhase = c.phases[0].value;
-  document.getElementById('userInput').value = c.phases[0].sample || '';
-
-  const quickContainer = document.getElementById('quickPrompts');
-  quickContainer.innerHTML = '';
-  c.quickPrompts.forEach(prompt => {
-    const btn = document.createElement('button');
-    btn.className = 'quick-btn';
-    btn.textContent = prompt;
-    btn.onclick = () => {
-      document.getElementById('userInput').value = prompt;
-      document.getElementById('userInput').focus();
-    };
-    quickContainer.appendChild(btn);
-  });
+  if(v==='h') render_hospital();
+  if(v==='i') render_insurer();
+  if(v==='p') render_patient();
 }
-
-function formatResponse(text) {
-  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-  text = text.replace(/^## (.+)$/gm, '<h3>$1</h3>');
-  text = text.replace(/^# (.+)$/gm, '<h3>$1</h3>');
-  const lines = text.split('\n');
-  const result = [];
-  let inList = false;
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
-      if (!inList) { result.push('<ul>'); inList = true; }
-      result.push(`<li>${trimmed.slice(2)}</li>`);
-    } else {
-      if (inList) { result.push('</ul>'); inList = false; }
-      if (trimmed.startsWith('<h3>') || trimmed === '') result.push(trimmed);
-      else if (trimmed) result.push(`<p>${trimmed}</p>`);
-    }
-  }
-  if (inList) result.push('</ul>');
-  return result.join('\n');
-}
-
-async function sendMessage() {
-  const input = document.getElementById('userInput').value.trim();
-  if (!input) return;
-
-  const c = content[currentLang];
-  const card = document.getElementById('responseCard');
-  const loading = document.getElementById('loadingIndicator');
-  const body = document.getElementById('responseBody');
-  const errorMsg = document.getElementById('errorMsg');
-  const btn = document.getElementById('sendBtn');
-
-  card.classList.add('visible');
-  loading.classList.add('visible');
-  body.innerHTML = '';
-  errorMsg.classList.remove('visible');
-  btn.disabled = true;
-
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-          "Content-Type": "application/json"
-        },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: c.systemPrompt(selectedPhase),
-        messages: [{ role: "user", content: input }]
-      })
-    });
-
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-
-    const text = data.content?.map(b => b.text || '').join('') || '';
-    loading.classList.remove('visible');
-
-    const paragraphs = text.split('\n\n');
-    const lastPara = paragraphs[paragraphs.length - 1];
-    const disclaimerKeywords = ['not a substitute', 'educational', 'care team', 'clinical decisions', 'אינו תחליף', 'חינוכי', 'צוות הטיפול', 'החלטות קליניות'];
-    let mainText = text;
-    let disclaimer = '';
-
-    if (lastPara && disclaimerKeywords.some(k => lastPara.toLowerCase().includes(k.toLowerCase()))) {
-      disclaimer = lastPara.replace(/^#+\s*/, '');
-      mainText = paragraphs.slice(0, -1).join('\n\n');
-    }
-
-    body.innerHTML = formatResponse(mainText);
-    if (disclaimer) body.innerHTML += `<div class="disclaimer">${disclaimer}</div>`;
-
-  } catch (err) {
-    loading.classList.remove('visible');
-    errorMsg.textContent = c.errorText;
-    errorMsg.classList.add('visible');
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-document.getElementById('userInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) sendMessage();
-});
-
-renderUI();
+show('h');
 </script>
 </body>
 </html>
