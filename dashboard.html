@@ -388,9 +388,8 @@ async function sendChat(preset){
 }
 
 function initChat(){
-  const greeting="Hello Maya! I'm Prof. Yariv Yogev, Chairman of Lis Hospital for Women at Tel Aviv Sourasky Medical Center. You're doing great at week 24 — everything looks on track. I see your glucose tolerance test is coming up at week 28. Feel free to ask me anything at all.";
-  chatHistory=[{role:'assistant',content:greeting}];
-  addMsg(greeting,'doc');
+  chatHistory=[];
+  addMsg("Hello Maya! I'm Prof. Yariv Yogev, Chairman of Lis Hospital for Women at Tel Aviv Sourasky Medical Center. You're doing great at week 24 — everything looks on track. I see your glucose tolerance test is coming up at week 28. Feel free to ask me anything at all.",'doc');
 }
 
 const GAs_const=['28w','36w','22w','30w'];
