@@ -16,31 +16,36 @@ module.exports = async function handler(req, res) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 200,
-        system: `You are a clinical triage assistant for SAFE OB. The patient is Maya, week 24 of pregnancy, cared for at Lis Hospital for Women, Tel Aviv Sourasky Medical Center.
+        model: 'claude-sonnet-4-6',
+        max_tokens: 300,
+        system: `You are the clinical triage system for Prof. Yariv Yogev's team at Lis Hospital for Women, Tel Aviv Sourasky Medical Center.
 
-Assess the symptom and respond with ONLY valid JSON in this exact format, nothing else:
-{"urgency":"routine|call|emergency","headline":"short action phrase max 8 words","message":"2 calm sentences — what to do and why"}
+The patient is Maya — week 24 of her first pregnancy, due September 14 2025, under the care of Dr. Chen (OB-GYN). Her recent vitals are normal (BP 118-122/75-78). She has a glucose tolerance test coming up at week 28. No known complications so far.
 
-Urgency definitions:
-- "routine": normal pregnancy symptom, monitor at home
-- "call": needs attention today, call the clinic — not life-threatening
-- "emergency": go to labor & delivery immediately — could be serious
+When Maya describes a symptom, assess it in the context of her specific situation and respond with ONLY a JSON object — no extra text, no markdown, no code blocks. Use this exact format:
+{"urgency":"routine|call|emergency","headline":"Direct action phrase, max 8 words","message":"2-3 warm, specific sentences. Reference her week, her doctor, or her upcoming appointments when relevant. Sound like her care team, not a generic bot."}
 
-Be direct, calm, and specific. Never be vague. Never add text outside the JSON.`,
+Urgency levels:
+- "routine": normal at week 24, monitor at home, nothing alarming
+- "call": warrants a call to the clinic today — not an emergency but needs attention
+- "emergency": go to labor & delivery immediately — potentially serious
+
+Always be specific to Maya's situation. If she mentions headache + swelling, that's preeclampsia risk at week 24 — treat it seriously. If she mentions round ligament pain or heartburn, reassure her it's normal. Never be vague.`,
         messages: [{ role: 'user', content: symptom }],
       }),
     });
 
     const data = await response.json();
-    const parsed = JSON.parse(data.content[0].text.trim());
+    const raw = data.content[0].text.trim()
+      .replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+    const parsed = JSON.parse(raw);
     res.status(200).json(parsed);
   } catch (err) {
+    console.error('Triage error:', err);
     res.status(200).json({
       urgency: 'call',
-      headline: 'Call the clinic to be safe',
-      message: "We weren't able to assess this automatically. Please call your clinic now to describe what you're experiencing.",
+      headline: 'Call Dr. Chen\'s clinic to be safe',
+      message: "We weren't able to assess this automatically. Please call Lis Hospital directly to describe what you're feeling — the team knows your case and will advise you quickly.",
     });
   }
 };
